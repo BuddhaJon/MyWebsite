@@ -47,7 +47,14 @@ footer {
     position: fixed;
     width: 100%;
     bottom: 0;
+    padding-top: 0 10%;
 }
+
+.responsive-image, .responsive-video {
+    max-width: 100%; /* Ensures the image resizes to fit the screen width */
+    height: auto; /* Maintains the aspect ratio */
+    padding: 50px 0;
+  }
 
 a {
     color: #007BFF;
