@@ -1,0 +1,1624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cybersecurity Practice Test</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="pictures/favicon.png" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <!-- Consistent header -->
+    <header>
+        <h1>Jonathan Rothe</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About Me</a></li>
+                <li><a href="resume.html">My Resume</a></li>
+                <li><a href="projects.html">Projects</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="test-container">
+            <h2>Cybersecurity Practice Test</h2>
+            <div id="question-container">
+                <!-- Question will be injected here -->
+            </div>
+            <div class="navigation-buttons">
+                <button id="prev-button" disabled>Previous</button>
+                <button id="next-button">Next</button>
+                <button id="submit-button" style="display: none;">Submit</button>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Developed by Jonathan Rothe</p>
+    </footer>
+
+    <!-- JavaScript code -->
+    <script>
+        const questions = [];
+
+        // Initialize questions according to domain percentages
+        const domains = [
+            { name: "General Security Concepts", percentage: 12, questions: [] },
+            { name: "Threats, Vulnerabilities, and Mitigations", percentage: 22, questions: [] },
+            { name: "Security Architecture", percentage: 18, questions: [] },
+            { name: "Security Operations", percentage: 28, questions: [] },
+            { name: "Security Program Management and Oversight", percentage: 20, questions: [] },
+        ];
+
+// Domain 1: General Security Concepts (12 questions)
+const allQuestions = [
+    {
+        domain: "General Security Concepts",
+        question: "Which of the following is a technical control?",
+        options: [
+            "Security policy",
+            "Firewalls",
+            "Background checks",
+            "Physical locks"
+        ],
+        correctAnswer: [1],
+        explanation: "Firewalls are technical controls that enforce security policies through technical means.",
+        type: "single"
+    },
+    {
+        domain: "General Security Concepts",
+        question: "What does the 'I' stand for in the CIA triad of security?",
+        options: [
+            "Integrity",
+            "Identification",
+            "Inspection",
+            "Implementation"
+        ],
+        correctAnswer: [0],
+        explanation: "The 'I' in CIA stands for Integrity, which ensures data is accurate and unaltered.",
+        type: "single"
+    },
+    {
+        domain: "General Security Concepts",
+        question: "Which control types are designed to discover unwanted or unauthorized activity? (Select TWO)",
+        options: [
+            "Preventive",
+            "Deterrent",
+            "Detective",
+            "Corrective",
+            "Compensating"
+        ],
+        correctAnswer: [2, 4],
+        explanation: "Detective and compensating controls help identify and address unauthorized activities.",
+        type: "multiple"
+    },
+    {
+        domain: "General Security Concepts",
+        question: "What principle requires that multiple individuals are needed to complete a critical task?",
+        options: [
+            "Least privilege",
+            "Separation of duties",
+            "Job rotation",
+            "Need to know"
+        ],
+        correctAnswer: [1],
+        explanation: "Separation of duties ensures no single individual has control over all phases of a transaction.",
+        type: "single"
+    },
+    {
+        domain: "General Security Concepts",
+        question: "Which of the following are examples of physical security controls? (Select TWO)",
+        options: [
+            "Encryption",
+            "Security awareness training",
+            "Security guards",
+            "Audit logs",
+            "Bollards"
+        ],
+        correctAnswer: [2, 4],
+        explanation: "Security guards and bollards are physical security controls that prevent unauthorized physical access.",
+        type: "multiple"
+    },
+    {
+        domain: "General Security Concepts",
+        question: "Non-repudiation ensures that:",
+        options: [
+            "Data remains confidential.",
+            "Actions cannot be denied by the user who performed them.",
+            "System uptime is maximized.",
+            "Access is granted to all users."
+        ],
+        correctAnswer: [1],
+        explanation: "Non-repudiation provides proof of the integrity and origin of data, preventing denial of actions.",
+        type: "single"
+    },
+    {
+        domain: "General Security Concepts",
+        question: "Which control category includes policies and procedures?",
+        options: [
+            "Technical",
+            "Managerial",
+            "Operational",
+            "Physical"
+        ],
+        correctAnswer: [1],
+        explanation: "Managerial controls involve policies, procedures, and guidelines that govern organizational operations.",
+        type: "single"
+    },
+    {
+        domain: "General Security Concepts",
+        question: "What is the main purpose of change management in security?",
+        options: [
+            "To expedite system updates",
+            "To ensure all changes are documented and approved",
+            "To train users on new software",
+            "To enforce strict access controls"
+        ],
+        correctAnswer: [1],
+        explanation: "Change management ensures that all changes are reviewed, approved, and documented to maintain system integrity.",
+        type: "single"
+    },
+    {
+        domain: "General Security Concepts",
+        question: "Zero Trust Architecture operates on the principle of:",
+        options: [
+            "Always trusting internal users",
+            "Never trusting any user or device by default",
+            "Trusting all users after authentication",
+            "Granting access based on physical location"
+        ],
+        correctAnswer: [1],
+        explanation: "Zero Trust Architecture assumes no user or device should be trusted by default, regardless of location.",
+        type: "single"
+    },
+    {
+        domain: "General Security Concepts",
+        question: "Bollards are used in physical security to:",
+        options: [
+            "Detect unauthorized access",
+            "Prevent vehicle-based attacks",
+            "Monitor network traffic",
+            "Control electronic access"
+        ],
+        correctAnswer: [1],
+        explanation: "Bollards are physical barriers that prevent vehicles from entering restricted areas.",
+        type: "single"
+    },
+    {
+        domain: "General Security Concepts",
+        question: "The principle of 'least privilege' means:",
+        options: [
+            "Users have access to all systems",
+            "Administrators share their credentials",
+            "Access is granted based on minimum necessary permissions",
+            "Users can grant access to others"
+        ],
+        correctAnswer: [2],
+        explanation: "Least privilege ensures users are granted only the permissions needed to perform their duties.",
+        type: "single"
+    },
+    {
+        domain: "General Security Concepts",
+        question: "Authentication, Authorization, and Accounting (AAA) are essential for:",
+        options: [
+            "User training",
+            "Access control",
+            "Data encryption",
+            "Physical security"
+        ],
+        correctAnswer: [1],
+        explanation: "AAA is a framework for controlling access to resources, verifying identity, granting permissions, and tracking user activities.",
+        type: "single"
+    },
+
+    //Domain 2: Threats, Vulnerabilities, and Mitigations
+    {
+        domain: "Threats, Vulnerabilities, and Mitigations",
+        question: "Which type of malware replicates itself without user interaction?",
+        options: [
+            "Virus",
+            "Worm",
+            "Trojan horse",
+            "Spyware"
+        ],
+        correctAnswer: [1],
+        explanation: "Worms are self-replicating malware that spread without user action.",
+        type: "single"
+    },
+    {
+        domain: "Threats, Vulnerabilities, and Mitigations",
+        question: "What is a common motivation for nation-state threat actors?",
+        options: [
+            "Financial gain",
+            "Political espionage",
+            "Random vandalism",
+            "Script kiddie challenges"
+        ],
+        correctAnswer: [1],
+        explanation: "Nation-states often engage in cyber espionage to gain political or military advantage.",
+        type: "single"
+    },
+    {
+        domain: "Threats, Vulnerabilities, and Mitigations",
+        question: "An attacker tricking a user into providing sensitive information by impersonating a trusted entity is known as:",
+        options: [
+            "Phishing",
+            "Smishing",
+            "Spear phishing",
+            "Vishing"
+        ],
+        correctAnswer: [0],
+        explanation: "Phishing involves deceiving users to obtain sensitive information by posing as a trustworthy entity.",
+        type: "single"
+    },
+    {
+        domain: "Threats, Vulnerabilities, and Mitigations",
+        question: "Which vulnerability allows an attacker to execute code remotely due to improper input validation?",
+        options: [
+            "SQL Injection",
+            "Cross-Site Scripting (XSS)",
+            "Buffer Overflow",
+            "Denial-of-Service"
+        ],
+        correctAnswer: [2],
+        explanation: "Buffer overflows occur when applications do not properly validate input lengths, allowing code execution.",
+        type: "single"
+    },
+    {
+        domain: "Threats, Vulnerabilities, and Mitigations",
+        question: "What type of threat actor is typically motivated by financial gain and uses sophisticated techniques?",
+        options: [
+            "Hacktivist",
+            "Insider threat",
+            "Organized crime",
+            "Unskilled attacker"
+        ],
+        correctAnswer: [2],
+        explanation: "Organized crime groups are well-funded and use advanced methods to steal data for financial gain.",
+        type: "single"
+    },
+    {
+        domain: "Threats, Vulnerabilities, and Mitigations",
+        question: "Which of the following is an example of social engineering?",
+        options: [
+            "Exploiting a software vulnerability",
+            "Guessing a password using brute-force",
+            "Tricking a user into revealing their password",
+            "Intercepting network traffic"
+        ],
+        correctAnswer: [2],
+        explanation: "Social engineering manipulates individuals into divulging confidential information.",
+        type: "single"
+    },
+    {
+        domain: "Threats, Vulnerabilities, and Mitigations",
+        question: "What is a zero-day vulnerability?",
+        options: [
+            "A vulnerability that has been patched",
+            "A vulnerability known to attackers but not yet patched",
+            "A vulnerability that affects zero systems",
+            "A vulnerability discovered on the first day of the month"
+        ],
+        correctAnswer: [1],
+        explanation: "Zero-day vulnerabilities are unknown to the vendor and have no available patch, making them exploitable.",
+        type: "single"
+    },
+    {
+        domain: "Threats, Vulnerabilities, and Mitigations",
+        question: "Which attack involves redirecting users to a fraudulent website that mimics a legitimate one?",
+        options: [
+            "DNS poisoning",
+            "ARP spoofing",
+            "Man-in-the-middle",
+            "Replay attack"
+        ],
+        correctAnswer: [0],
+        explanation: "DNS poisoning alters DNS records to redirect traffic to malicious sites.",
+        type: "single"
+    },
+    {
+        domain: "Threats, Vulnerabilities, and Mitigations",
+        question: "Which of the following is a cryptographic attack that attempts to find two inputs producing the same hash?",
+        options: [
+            "Brute-force attack",
+            "Collision attack",
+            "Dictionary attack",
+            "Rainbow table attack"
+        ],
+        correctAnswer: [1],
+        explanation: "Collision attacks exploit hash functions by finding two inputs that produce the same hash value.",
+        type: "single"
+    },
+    {
+        domain: "Threats, Vulnerabilities, and Mitigations",
+        question: "What mitigation technique can prevent SQL injection attacks?",
+        options: [
+            "Input validation",
+            "Using default passwords",
+            "Disabling firewalls",
+            "Open network shares"
+        ],
+        correctAnswer: [0],
+        explanation: "Proper input validation ensures only acceptable data is processed, preventing SQL injection.",
+        type: "single"
+    },
+    {
+        domain: "Threats, Vulnerabilities, and Mitigations",
+        question: "An attacker who gains physical access to a device to install a hardware keylogger is exploiting which type of vulnerability?",
+        options: [
+            "Application-based",
+            "Web-based",
+            "Hardware-based",
+            "Cryptographic"
+        ],
+        correctAnswer: [2],
+        explanation: "Hardware-based vulnerabilities involve physical components that can be exploited.",
+        type: "single"
+    },
+    {
+        domain: "Threats, Vulnerabilities, and Mitigations",
+        question: "What is the primary goal of a Denial-of-Service (DoS) attack?",
+        options: [
+            "To steal confidential information",
+            "To gain unauthorized access",
+            "To make a system or service unavailable",
+            "To modify data"
+        ],
+        correctAnswer: [2],
+        explanation: "DoS attacks aim to disrupt normal service, making resources unavailable to users.",
+        type: "single"
+    },
+    {
+        domain: "Threats, Vulnerabilities, and Mitigations",
+        question: "Which threat vector involves exploiting a vulnerability in image files?",
+        options: [
+            "Message-based",
+            "Image-based",
+            "File-based",
+            "Software-based"
+        ],
+        correctAnswer: [1],
+        explanation: "Image-based threats exploit vulnerabilities in image processing to execute malicious code.",
+        type: "single"
+    },
+    {
+        domain: "Threats, Vulnerabilities, and Mitigations",
+        question: "What is a common characteristic of a spear phishing attack?",
+        options: [
+            "Targets a large, random audience",
+            "Is conducted over the phone",
+            "Is highly personalized and targets specific individuals",
+            "Uses physical mail to deliver malware"
+        ],
+        correctAnswer: [2],
+        explanation: "Spear phishing is a targeted attack tailored to specific individuals or organizations.",
+        type: "single"
+    },
+    {
+        domain: "Threats, Vulnerabilities, and Mitigations",
+        question: "Which of the following is NOT a common threat actor?",
+        options: [
+            "Script kiddie",
+            "Shadow IT",
+            "Hacktivist",
+            "Nation-state"
+        ],
+        correctAnswer: [1],
+        explanation: "Shadow IT refers to unauthorized systems within an organization, not a threat actor.",
+        type: "single"
+    },
+    {
+        domain: "Threats, Vulnerabilities, and Mitigations",
+        question: "Which malware type restricts access to files by encrypting them until a ransom is paid?",
+        options: [
+            "Adware",
+            "Spyware",
+            "Ransomware",
+            "Rootkit"
+        ],
+        correctAnswer: [2],
+        explanation: "Ransomware encrypts files and demands payment for the decryption key.",
+        type: "single"
+    },
+    {
+        domain: "Threats, Vulnerabilities, and Mitigations",
+        question: "What mitigation technique involves applying updates to fix security vulnerabilities?",
+        options: [
+            "Patch management",
+            "User training",
+            "Network segmentation",
+            "Disabling unused services"
+        ],
+        correctAnswer: [0],
+        explanation: "Patch management involves regularly updating software to fix known vulnerabilities.",
+        type: "single"
+    },
+    {
+        domain: "Threats, Vulnerabilities, and Mitigations",
+        question: "An insider threat is best described as:",
+        options: [
+            "An external hacker breaching the network",
+            "A former employee attacking the company",
+            "A trusted individual within the organization who poses a risk",
+            "An accidental security breach by a third party"
+        ],
+        correctAnswer: [2],
+        explanation: "Insider threats originate from individuals within the organization who may misuse access.",
+        type: "single"
+    },
+    {
+        domain: "Threats, Vulnerabilities, and Mitigations",
+        question: "Which of the following attacks involves an attacker intercepting and altering communication between two parties?",
+        options: [
+            "Phishing",
+            "Replay attack",
+            "Man-in-the-middle attack",
+            "Denial-of-Service attack"
+        ],
+        correctAnswer: [2],
+        explanation: "Man-in-the-middle attacks involve intercepting and possibly altering communication between parties.",
+        type: "single"
+    },
+    {
+        domain: "Threats, Vulnerabilities, and Mitigations",
+        question: "What is the purpose of a Distributed Denial-of-Service (DDoS) attack?",
+        options: [
+            "To distribute malware via email",
+            "To overload a system using multiple compromised systems",
+            "To intercept data between two systems",
+            "To gain unauthorized access through social engineering"
+        ],
+        correctAnswer: [1],
+        explanation: "A DDoS attack uses multiple systems to flood the target, overwhelming its resources.",
+        type: "single"
+    },
+    {
+        domain: "Threats, Vulnerabilities, and Mitigations",
+        question: "Which mitigation technique can help protect against malware introduced through removable media?",
+        options: [
+            "Implementing strong passwords",
+            "Disabling AutoRun features",
+            "Using default administrator accounts",
+            "Enabling guest network access"
+        ],
+        correctAnswer: [1],
+        explanation: "Disabling AutoRun prevents automatic execution of potentially malicious programs from removable media.",
+        type: "single"
+    },
+    {
+        domain: "Threats, Vulnerabilities, and Mitigations",
+        question: "What is a common method attackers use to exploit vulnerable software?",
+        options: [
+            "Buffer overflows",
+            "Strong authentication",
+            "Encrypted communication",
+            "Regular backups"
+        ],
+        correctAnswer: [0],
+        explanation: "Attackers exploit buffer overflows to execute arbitrary code on vulnerable systems.",
+        type: "single"
+    },
+    {
+        domain: "Threats, Vulnerabilities, and Mitigations",
+        question: "Which of the following best describes a brute-force attack?",
+        options: [
+            "An attacker uses social engineering to obtain credentials",
+            "An attacker tries every possible password combination",
+            "An attacker exploits a zero-day vulnerability",
+            "An attacker redirects network traffic to a malicious site"
+        ],
+        correctAnswer: [1],
+        explanation: "Brute-force attacks involve systematically attempting all possible passwords until the correct one is found.",
+        type: "single"
+    },
+
+// Domain 3: Security Architecture
+{
+    domain: "Security Architecture",
+    question: "Which of the following best describes Infrastructure as Code (IaC)?",
+    options: [
+        "Using code to manage and provision infrastructure resources",
+        "A programming language for building applications",
+        "A framework for developing secure code",
+        "A policy for code reviews"
+    ],
+    correctAnswer: [0],
+    explanation: "IaC involves managing and provisioning computing infrastructure through machine-readable definition files, rather than physical hardware configuration.",
+    type: "single"
+},
+{
+    domain: "Security Architecture",
+    question: "What is the primary security concern with Internet of Things (IoT) devices?",
+    options: [
+        "They consume too much bandwidth",
+        "They often lack robust security controls",
+        "They are expensive to deploy",
+        "They require specialized network protocols"
+    ],
+    correctAnswer: [1],
+    explanation: "IoT devices often have minimal security features, making them vulnerable to attacks.",
+    type: "single"
+},
+{
+    domain: "Security Architecture",
+    question: "Which of the following are benefits of using a microservices architecture? (Select TWO)",
+    options: [
+        "Improved scalability",
+        "Simplified monolithic codebase",
+        "Isolation of services",
+        "Reduced need for security",
+        "Increased hardware dependency"
+    ],
+    correctAnswer: [0, 2],
+    explanation: "Microservices architecture improves scalability and allows for isolation of individual services.",
+    type: "multiple"
+},
+{
+    domain: "Security Architecture",
+    question: "In cloud computing, what does 'serverless' refer to?",
+    options: [
+        "Applications that run without servers",
+        "Services that automatically fix server issues",
+        "A cloud computing execution model where the cloud provider manages the server infrastructure",
+        "An on-premises data center without physical servers"
+    ],
+    correctAnswer: [2],
+    explanation: "Serverless computing allows developers to build and run applications without managing the underlying server infrastructure.",
+    type: "single"
+},
+{
+    domain: "Security Architecture",
+    question: "Which security principle involves dividing a network into multiple zones to control access?",
+    options: [
+        "Least privilege",
+        "Network segmentation",
+        "Zero Trust",
+        "Defense in depth"
+    ],
+    correctAnswer: [1],
+    explanation: "Network segmentation divides the network into zones to enhance security by limiting access between them.",
+    type: "single"
+},
+{
+    domain: "Security Architecture",
+    question: "What is the purpose of a demilitarized zone (DMZ) in network architecture?",
+    options: [
+        "To host internal databases",
+        "To separate and expose external-facing services to untrusted networks",
+        "To encrypt internal communications",
+        "To serve as a backup location"
+    ],
+    correctAnswer: [1],
+    explanation: "A DMZ is a network segment that exposes external services while isolating them from the internal network.",
+    type: "single"
+},
+{
+    domain: "Security Architecture",
+    question: "Which of the following ensures data cannot be read by unauthorized parties?",
+    options: [
+        "Hashing",
+        "Tokenization",
+        "Encryption",
+        "Decryption"
+    ],
+    correctAnswer: [2],
+    explanation: "Encryption transforms data into a secure format that cannot be read without a decryption key.",
+    type: "single"
+},
+{
+    domain: "Security Architecture",
+    question: "What is tokenization in data security?",
+    options: [
+        "Replacing sensitive data with unique identification symbols",
+        "Encrypting data with a public key",
+        "Hashing data for integrity",
+        "Compressing data to save space"
+    ],
+    correctAnswer: [0],
+    explanation: "Tokenization replaces sensitive data with non-sensitive placeholders called tokens.",
+    type: "single"
+},
+{
+    domain: "Security Architecture",
+    question: "Which data classification level is appropriate for information that could cause serious damage if disclosed?",
+    options: [
+        "Public",
+        "Confidential",
+        "Private",
+        "Sensitive"
+    ],
+    correctAnswer: [1],
+    explanation: "Confidential data is highly sensitive and its disclosure could cause significant harm.",
+    type: "single"
+},
+{
+    domain: "Security Architecture",
+    question: "What is the primary goal of implementing high availability in a security architecture?",
+    options: [
+        "To reduce hardware costs",
+        "To ensure continuous operation without downtime",
+        "To simplify network design",
+        "To enhance encryption methods"
+    ],
+    correctAnswer: [1],
+    explanation: "High availability aims to minimize downtime and ensure critical systems are always operational.",
+    type: "single"
+},
+{
+    domain: "Security Architecture",
+    question: "Which backup site type is fully equipped and can be operational immediately after a disaster?",
+    options: [
+        "Cold site",
+        "Warm site",
+        "Hot site",
+        "Mobile site"
+    ],
+    correctAnswer: [2],
+    explanation: "A hot site is fully operational and can take over functions immediately with minimal downtime.",
+    type: "single"
+},
+{
+    domain: "Security Architecture",
+    question: "In security architecture, what is meant by 'defense in depth'?",
+    options: [
+        "Relying on a single security measure",
+        "Implementing multiple layers of security controls",
+        "Focusing security efforts on the network perimeter only",
+        "Using deep learning algorithms for security"
+    ],
+    correctAnswer: [1],
+    explanation: "Defense in depth employs multiple layers of security controls to protect assets.",
+    type: "single"
+},
+{
+    domain: "Security Architecture",
+    question: "Which concept involves preparing for potential failures to maintain system availability?",
+    options: [
+        "Encryption",
+        "Redundancy",
+        "Tokenization",
+        "Hashing"
+    ],
+    correctAnswer: [1],
+    explanation: "Redundancy involves duplicating critical components to prevent system failure.",
+    type: "single"
+},
+{
+    domain: "Security Architecture",
+    question: "Which of the following is an example of Infrastructure as a Service (IaaS)?",
+    options: [
+        "Amazon EC2",
+        "Google Docs",
+        "Microsoft Office 365",
+        "Salesforce CRM"
+    ],
+    correctAnswer: [0],
+    explanation: "Amazon EC2 provides virtualized computing resources over the internet, fitting the IaaS model.",
+    type: "single"
+},
+{
+    domain: "Security Architecture",
+    question: "Which network device filters traffic based on predefined rules to prevent unauthorized access?",
+    options: [
+        "Switch",
+        "Router",
+        "Firewall",
+        "Hub"
+    ],
+    correctAnswer: [2],
+    explanation: "Firewalls monitor and control incoming and outgoing network traffic based on security rules.",
+    type: "single"
+},
+{
+    domain: "Security Architecture",
+    question: "What is the primary purpose of hashing in data protection?",
+    options: [
+        "To encrypt data for confidentiality",
+        "To ensure data integrity by detecting changes",
+        "To compress data for storage efficiency",
+        "To authenticate user identities"
+    ],
+    correctAnswer: [1],
+    explanation: "Hashing creates a unique fixed-size output that changes if the input data is altered, ensuring integrity.",
+    type: "single"
+},
+{
+    domain: "Security Architecture",
+    question: "Which of the following strategies helps in capacity planning?",
+    options: [
+        "Regular backups",
+        "Monitoring resource usage trends",
+        "Implementing strict access controls",
+        "Encrypting all data"
+    ],
+    correctAnswer: [1],
+    explanation: "Monitoring resource usage helps anticipate future needs and plan accordingly.",
+    type: "single"
+},
+{
+    domain: "Security Architecture",
+    question: "What is a key security benefit of using a serverless architecture?",
+    options: [
+        "Elimination of all security concerns",
+        "Reduced attack surface due to managed infrastructure",
+        "Increased control over the operating system",
+        "Simplified compliance requirements"
+    ],
+    correctAnswer: [1],
+    explanation: "Serverless architectures reduce the attack surface as the cloud provider manages the underlying infrastructure.",
+    type: "single"
+},
+
+// Domain 4: Security Operations
+{
+    domain: "Security Operations",
+    question: "Which of the following is a primary function of a Security Information and Event Management (SIEM) system?",
+    options: [
+        "To perform data encryption",
+        "To analyze security alerts and logs",
+        "To manage user authentication",
+        "To configure firewall rules"
+    ],
+    correctAnswer: [1],
+    explanation: "SIEM systems collect and analyze security data to detect and respond to threats.",
+    type: "single"
+},
+{
+    domain: "Security Operations",
+    question: "What is the purpose of Mobile Device Management (MDM) in security operations?",
+    options: [
+        "To manage and secure mobile devices used in the organization",
+        "To develop mobile applications",
+        "To encrypt data at rest on servers",
+        "To monitor network traffic"
+    ],
+    correctAnswer: [0],
+    explanation: "MDM solutions help secure and manage mobile devices within an organization.",
+    type: "single"
+},
+{
+    domain: "Security Operations",
+    question: "Which of the following are common activities in vulnerability management? (Select TWO)",
+    options: [
+        "Penetration testing",
+        "User training",
+        "Vulnerability scanning",
+        "Social engineering",
+        "Code development"
+    ],
+    correctAnswer: [0, 2],
+    explanation: "Vulnerability scanning and penetration testing are key components of vulnerability management.",
+    type: "multiple"
+},
+{
+    domain: "Security Operations",
+    question: "What does the principle of hardening targets involve?",
+    options: [
+        "Reducing the attack surface by configuring systems securely",
+        "Making systems more flexible",
+        "Adding additional software features",
+        "Removing all security controls"
+    ],
+    correctAnswer: [0],
+    explanation: "Hardening involves securing systems by reducing vulnerabilities and configuring them securely.",
+    type: "single"
+},
+{
+    domain: "Security Operations",
+    question: "Which of the following tools can help prevent data loss by monitoring and controlling endpoint activities?",
+    options: [
+        "Antivirus software",
+        "Firewall",
+        "Data Loss Prevention (DLP) systems",
+        "Virtual Private Network (VPN)"
+    ],
+    correctAnswer: [2],
+    explanation: "DLP systems monitor and control data transfer to prevent unauthorized data exfiltration.",
+    type: "single"
+},
+{
+    domain: "Security Operations",
+    question: "What is the main goal of implementing multifactor authentication (MFA)?",
+    options: [
+        "To simplify the login process",
+        "To enhance security by requiring multiple forms of verification",
+        "To store passwords in plain text",
+        "To allow anonymous access"
+    ],
+    correctAnswer: [1],
+    explanation: "MFA increases security by requiring users to provide multiple forms of authentication.",
+    type: "single"
+},
+{
+    domain: "Security Operations",
+    question: "Which of the following are common features of Mobile Device Management (MDM)? (Select TWO)",
+    options: [
+        "Remote wiping of devices",
+        "Monitoring network traffic",
+        "Device encryption enforcement",
+        "Developing mobile applications",
+        "Configuring firewalls"
+    ],
+    correctAnswer: [0, 2],
+    explanation: "MDM can enforce device encryption and remotely wipe devices to protect data.",
+    type: "multiple"
+},
+{
+    domain: "Security Operations",
+    question: "What is the primary purpose of a penetration test?",
+    options: [
+        "To scan for vulnerabilities",
+        "To test the effectiveness of security controls by simulating attacks",
+        "To train users on security policies",
+        "To update antivirus definitions"
+    ],
+    correctAnswer: [1],
+    explanation: "Penetration testing involves simulating attacks to evaluate the security of a system.",
+    type: "single"
+},
+{
+    domain: "Security Operations",
+    question: "Which security measure involves applying the latest patches to software and operating systems?",
+    options: [
+        "Access control",
+        "Patch management",
+        "Network segmentation",
+        "Encryption"
+    ],
+    correctAnswer: [1],
+    explanation: "Patch management ensures systems are updated to fix known vulnerabilities.",
+    type: "single"
+},
+{
+    domain: "Security Operations",
+    question: "Which of the following is an example of a detective control?",
+    options: [
+        "Firewalls",
+        "Security cameras",
+        "Antivirus software",
+        "Intrusion Detection Systems (IDS)"
+    ],
+    correctAnswer: [3],
+    explanation: "IDS are detective controls that monitor network or system activities for malicious actions.",
+    type: "single"
+},
+{
+    domain: "Security Operations",
+    question: "What is the purpose of a bug bounty program?",
+    options: [
+        "To penalize users for security breaches",
+        "To incentivize external researchers to report vulnerabilities",
+        "To train employees on security protocols",
+        "To create malware for testing"
+    ],
+    correctAnswer: [1],
+    explanation: "Bug bounty programs encourage individuals to report security flaws in exchange for rewards.",
+    type: "single"
+},
+{
+    domain: "Security Operations",
+    question: "Which of the following best describes continuous integration in software development?",
+    options: [
+        "Periodic code reviews",
+        "Integrating code changes frequently to detect issues early",
+        "Deploying software annually",
+        "Isolating development teams"
+    ],
+    correctAnswer: [1],
+    explanation: "Continuous integration involves frequent merging of code changes to detect and fix issues promptly.",
+    type: "single"
+},
+{
+    domain: "Security Operations",
+    question: "Which practice involves using automated tools to manage security tasks and workflows?",
+    options: [
+        "Manual configuration",
+        "Orchestration",
+        "Compliance auditing",
+        "Encryption"
+    ],
+    correctAnswer: [1],
+    explanation: "Orchestration automates security operations to improve efficiency and response times.",
+    type: "single"
+},
+{
+    domain: "Security Operations",
+    question: "What is the main advantage of using automated security tools?",
+    options: [
+        "Eliminates the need for security personnel",
+        "Reduces human error and speeds up response times",
+        "Increases manual workload",
+        "Decreases system performance"
+    ],
+    correctAnswer: [1],
+    explanation: "Automation reduces human error and allows for faster, more consistent security operations.",
+    type: "single"
+},
+{
+    domain: "Security Operations",
+    question: "Which activity is associated with incident response?",
+    options: [
+        "User provisioning",
+        "Vulnerability scanning",
+        "Containment and eradication",
+        "Routine backups"
+    ],
+    correctAnswer: [2],
+    explanation: "Incident response includes steps like containment, eradication, and recovery from security incidents.",
+    type: "single"
+},
+{
+    domain: "Security Operations",
+    question: "Which of the following logs would be most useful in investigating unauthorized access attempts?",
+    options: [
+        "Firewall logs",
+        "Application logs",
+        "System uptime logs",
+        "Environmental control logs"
+    ],
+    correctAnswer: [0],
+    explanation: "Firewall logs can reveal unauthorized access attempts by logging incoming and outgoing traffic.",
+    type: "single"
+},
+{
+    domain: "Security Operations",
+    question: "What is the purpose of user provisioning in security operations?",
+    options: [
+        "To monitor network traffic",
+        "To grant and manage user access rights",
+        "To perform vulnerability assessments",
+        "To encrypt data at rest"
+    ],
+    correctAnswer: [1],
+    explanation: "User provisioning involves creating and managing user accounts and access permissions.",
+    type: "single"
+},
+{
+    domain: "Security Operations",
+    question: "Which of the following are methods to enhance wireless network security? (Select TWO)",
+    options: [
+        "Using WPA3 encryption",
+        "Broadcasting the SSID",
+        "Enabling MAC address filtering",
+        "Using default administrator passwords",
+        "Disabling firewall protection"
+    ],
+    correctAnswer: [0, 2],
+    explanation: "Using strong encryption like WPA3 and enabling MAC address filtering enhance wireless security.",
+    type: "multiple"
+},
+{
+    domain: "Security Operations",
+    question: "What is the main function of an Intrusion Prevention System (IPS)?",
+    options: [
+        "To detect and alert on potential threats",
+        "To prevent unauthorized access by blocking malicious traffic",
+        "To analyze application performance",
+        "To manage user credentials"
+    ],
+    correctAnswer: [1],
+    explanation: "An IPS actively blocks detected threats to prevent potential damage.",
+    type: "single"
+},
+{
+    domain: "Security Operations",
+    question: "Which security practice involves restricting user permissions to the minimum necessary?",
+    options: [
+        "Separation of duties",
+        "Least privilege",
+        "Job rotation",
+        "Mandatory vacations"
+    ],
+    correctAnswer: [1],
+    explanation: "Least privilege ensures users have only the access needed to perform their jobs.",
+    type: "single"
+},
+{
+    domain: "Security Operations",
+    question: "What is the purpose of network segmentation in security operations?",
+    options: [
+        "To increase network speed",
+        "To simplify network architecture",
+        "To limit the spread of attacks within the network",
+        "To allow unrestricted access"
+    ],
+    correctAnswer: [2],
+    explanation: "Network segmentation isolates network segments to prevent threats from spreading.",
+    type: "single"
+},
+{
+    domain: "Security Operations",
+    question: "Which of the following describes the process of ensuring only authorized devices can connect to the network?",
+    options: [
+        "Network Access Control (NAC)",
+        "Network Address Translation (NAT)",
+        "Quality of Service (QoS)",
+        "Virtual Local Area Networks (VLANs)"
+    ],
+    correctAnswer: [0],
+    explanation: "NAC restricts network access to authorized devices and enforces security policies.",
+    type: "single"
+},
+{
+    domain: "Security Operations",
+    question: "What is the role of an access control list (ACL) in network security?",
+    options: [
+        "To encrypt data packets",
+        "To log user activities",
+        "To define rules that permit or deny network traffic",
+        "To provide user authentication"
+    ],
+    correctAnswer: [2],
+    explanation: "ACLs specify which traffic is allowed or denied based on defined criteria.",
+    type: "single"
+},
+{
+    domain: "Security Operations",
+    question: "Which of the following best describes the concept of 'defense in depth'?",
+    options: [
+        "Using a single security layer",
+        "Implementing multiple layers of security controls",
+        "Relying solely on encryption",
+        "Focusing on perimeter defenses only"
+    ],
+    correctAnswer: [1],
+    explanation: "Defense in depth employs multiple layers of controls to protect assets.",
+    type: "single"
+},
+{
+    domain: "Security Operations",
+    question: "Which action is part of the remediation phase in vulnerability management?",
+    options: [
+        "Identifying vulnerabilities",
+        "Assessing risks",
+        "Applying patches to fix vulnerabilities",
+        "Reporting to management"
+    ],
+    correctAnswer: [2],
+    explanation: "Remediation involves taking actions like patching to address identified vulnerabilities.",
+    type: "single"
+},
+{
+    domain: "Security Operations",
+    question: "Which of the following is a benefit of hardening operating systems?",
+    options: [
+        "Increased system performance",
+        "Reduced vulnerability to attacks",
+        "Simplified user experience",
+        "Elimination of the need for updates"
+    ],
+    correctAnswer: [1],
+    explanation: "Hardening reduces the attack surface by disabling unnecessary services and configuring security settings.",
+    type: "single"
+},
+{
+    domain: "Security Operations",
+    question: "What is the primary purpose of conducting security awareness training?",
+    options: [
+        "To ensure compliance with legal requirements",
+        "To educate users on security policies and best practices",
+        "To train users in programming",
+        "To reduce the need for technical controls"
+    ],
+    correctAnswer: [1],
+    explanation: "Security awareness training helps users understand and adhere to security policies.",
+    type: "single"
+},
+{
+    domain: "Security Operations",
+    question: "Which of the following is an example of a preventive control in security operations?",
+    options: [
+        "Audit logs",
+        "Security policies",
+        "Encryption",
+        "Surveillance cameras"
+    ],
+    correctAnswer: [2],
+    explanation: "Encryption prevents unauthorized access to data, acting as a preventive control.",
+    type: "single"
+},
+{
+    domain: "Security Operations",
+    question: "Which type of testing involves evaluating system security from the perspective of a malicious outsider?",
+    options: [
+        "White-box testing",
+        "Black-box testing",
+        "Gray-box testing",
+        "Unit testing"
+    ],
+    correctAnswer: [1],
+    explanation: "Black-box testing assesses security without prior knowledge of the system's internals.",
+    type: "single"
+},
+{
+    domain: "Security Operations",
+    question: "Which tools are commonly used for network monitoring? (Select TWO)",
+    options: [
+        "Intrusion Detection Systems (IDS)",
+        "Firewall configuration tools",
+        "Packet sniffers",
+        "Word processing software",
+        "Antivirus software"
+    ],
+    correctAnswer: [0, 2],
+    explanation: "IDS and packet sniffers are tools used to monitor network traffic and detect anomalies.",
+    type: "multiple"
+},
+
+// Domain 5: Security Program Management and Oversight
+{
+    domain: "Security Program Management and Oversight",
+    question: "Which of the following documents outline acceptable activities and behaviors for users? (Select TWO)",
+    options: [
+        "Acceptable Use Policy (AUP)",
+        "Service Level Agreement (SLA)",
+        "Password Policy",
+        "Business Continuity Plan (BCP)",
+        "Incident Response Plan (IRP)"
+    ],
+    correctAnswer: [0, 2],
+    explanation: "An Acceptable Use Policy and Password Policy define acceptable user behaviors and practices.",
+    type: "multiple"
+},
+{
+    domain: "Security Program Management and Oversight",
+    question: "What is the primary purpose of risk assessment in security management?",
+    options: [
+        "To eliminate all risks",
+        "To identify and evaluate potential risks to assets",
+        "To ensure compliance with marketing strategies",
+        "To train employees on new software"
+    ],
+    correctAnswer: [1],
+    explanation: "Risk assessment involves identifying assets, threats, vulnerabilities, and the potential impact to prioritize security efforts.",
+    type: "single"
+},
+{
+    domain: "Security Program Management and Oversight",
+    question: "Which of the following are risk management strategies? (Select TWO)",
+    options: [
+        "Risk acceptance",
+        "Risk creation",
+        "Risk transfer",
+        "Risk ignorance",
+        "Risk amplification"
+    ],
+    correctAnswer: [0, 2],
+    explanation: "Risk management strategies include accepting the risk or transferring it (e.g., through insurance).",
+    type: "multiple"
+},
+{
+    domain: "Security Program Management and Oversight",
+    question: "What is the main function of a Service Level Agreement (SLA)?",
+    options: [
+        "To outline security policies for employees",
+        "To define the level of service expected from a service provider",
+        "To describe the business continuity plan",
+        "To establish confidentiality requirements"
+    ],
+    correctAnswer: [1],
+    explanation: "An SLA specifies the expected level of service between a provider and a client.",
+    type: "single"
+},
+{
+    domain: "Security Program Management and Oversight",
+    question: "Which process involves evaluating third-party vendors to ensure they meet organizational security requirements?",
+    options: [
+        "Vendor assessment",
+        "User training",
+        "Patch management",
+        "Incident response"
+    ],
+    correctAnswer: [0],
+    explanation: "Vendor assessment evaluates third parties for compliance with security policies and standards.",
+    type: "single"
+},
+{
+    domain: "Security Program Management and Oversight",
+    question: "Which of the following is a purpose of security compliance audits?",
+    options: [
+        "To enforce disciplinary actions",
+        "To identify deviations from security policies and standards",
+        "To develop new marketing strategies",
+        "To train new employees"
+    ],
+    correctAnswer: [1],
+    explanation: "Compliance audits assess adherence to policies, procedures, and regulatory requirements.",
+    type: "single"
+},
+{
+    domain: "Security Program Management and Oversight",
+    question: "What is the goal of a risk analysis process?",
+    options: [
+        "To quantify the potential impact of identified risks",
+        "To eliminate all threats",
+        "To develop software applications",
+        "To increase system performance"
+    ],
+    correctAnswer: [0],
+    explanation: "Risk analysis evaluates the potential impact and likelihood of risks to prioritize mitigation efforts.",
+    type: "single"
+},
+{
+    domain: "Security Program Management and Oversight",
+    question: "Which agreement is specifically designed to protect confidential information shared between parties?",
+    options: [
+        "Service Level Agreement (SLA)",
+        "Non-Disclosure Agreement (NDA)",
+        "Business Partnership Agreement (BPA)",
+        "Memorandum of Understanding (MOU)"
+    ],
+    correctAnswer: [1],
+    explanation: "An NDA is a legal contract that outlines confidentiality obligations to protect sensitive information.",
+    type: "single"
+},
+{
+    domain: "Security Program Management and Oversight",
+    question: "Which elements are typically included in effective security governance? (Select TWO)",
+    options: [
+        "Policies and procedures",
+        "Random access control",
+        "Disorganized leadership",
+        "Clear security roles and responsibilities",
+        "Ignoring regulatory requirements"
+    ],
+    correctAnswer: [0, 3],
+    explanation: "Effective security governance includes well-defined policies, procedures, and clear roles and responsibilities.",
+    type: "multiple"
+},
+{
+    domain: "Security Program Management and Oversight",
+    question: "What is the purpose of a Business Continuity Plan (BCP)?",
+    options: [
+        "To define acceptable user behavior",
+        "To ensure the organization can continue operations during a disruption",
+        "To describe network architecture",
+        "To train employees on new technologies"
+    ],
+    correctAnswer: [1],
+    explanation: "A BCP outlines procedures to maintain business functions during and after a disaster.",
+    type: "single"
+},
+{
+    domain: "Security Program Management and Oversight",
+    question: "Which of the following best describes quantitative risk analysis?",
+    options: [
+        "Assigning numerical values to risks for objective measurement",
+        "Using subjective judgment to assess risks",
+        "Ignoring potential risks",
+        "Transferring risks to another party"
+    ],
+    correctAnswer: [0],
+    explanation: "Quantitative risk analysis uses numerical values to evaluate the impact and likelihood of risks.",
+    type: "single"
+},
+{
+    domain: "Security Program Management and Oversight",
+    question: "Which type of assessment involves simulating attacks to test an organization's security posture?",
+    options: [
+        "Compliance audit",
+        "Penetration testing",
+        "Business Impact Analysis",
+        "User acceptance testing"
+    ],
+    correctAnswer: [1],
+    explanation: "Penetration testing simulates attacks to identify vulnerabilities and assess security defenses.",
+    type: "single"
+},
+{
+    domain: "Security Program Management and Oversight",
+    question: "What is the primary objective of security awareness training?",
+    options: [
+        "To improve technical skills",
+        "To educate employees about security policies and best practices",
+        "To develop software applications",
+        "To increase sales figures"
+    ],
+    correctAnswer: [1],
+    explanation: "Security awareness training informs employees about security risks and how to follow policies.",
+    type: "single"
+},
+{
+    domain: "Security Program Management and Oversight",
+    question: "Which of the following are common elements of an acceptable use policy (AUP)? (Select TWO)",
+    options: [
+        "Definitions of acceptable and unacceptable activities",
+        "Encryption algorithms to use",
+        "Guidelines for using company resources",
+        "Financial projections",
+        "Programming standards"
+    ],
+    correctAnswer: [0, 2],
+    explanation: "An AUP outlines acceptable behaviors and guidelines for using organizational resources.",
+    type: "multiple"
+},
+{
+    domain: "Security Program Management and Oversight",
+    question: "What is a Business Impact Analysis (BIA) used for?",
+    options: [
+        "To identify the effects of interruptions on business operations",
+        "To develop marketing strategies",
+        "To train employees in new software",
+        "To monitor network traffic"
+    ],
+    correctAnswer: [0],
+    explanation: "A BIA assesses the impact of disruptions on critical business functions and processes.",
+    type: "single"
+},
+{
+    domain: "Security Program Management and Oversight",
+    question: "Which agreement type is used to define the terms and conditions between business partners?",
+    options: [
+        "Service Level Agreement (SLA)",
+        "Non-Disclosure Agreement (NDA)",
+        "Business Partnership Agreement (BPA)",
+        "End-User License Agreement (EULA)"
+    ],
+    correctAnswer: [2],
+    explanation: "A BPA outlines the obligations and expectations between business partners.",
+    type: "single"
+},
+{
+    domain: "Security Program Management and Oversight",
+    question: "What is the role of an incident response plan in security management?",
+    options: [
+        "To prevent all security incidents",
+        "To provide a structured approach for handling security incidents",
+        "To train employees on new software",
+        "To manage vendor relationships"
+    ],
+    correctAnswer: [1],
+    explanation: "An incident response plan outlines procedures for identifying, responding to, and recovering from security incidents.",
+    type: "single"
+},
+{
+    domain: "Security Program Management and Oversight",
+    question: "Which of the following are benefits of conducting regular security audits? (Select TWO)",
+    options: [
+        "Identifying compliance gaps",
+        "Eliminating the need for security policies",
+        "Detecting security weaknesses",
+        "Increasing the number of security incidents",
+        "Reducing the need for user training"
+    ],
+    correctAnswer: [0, 2],
+    explanation: "Security audits help identify compliance issues and detect security weaknesses for remediation.",
+    type: "multiple"
+},
+{
+    domain: "Security Program Management and Oversight",
+    question: "Which risk management strategy involves sharing the risk with another party, such as through insurance?",
+    options: [
+        "Risk avoidance",
+        "Risk acceptance",
+        "Risk transference",
+        "Risk mitigation"
+    ],
+    correctAnswer: [2],
+    explanation: "Risk transference shifts the risk to another party, often through insurance or outsourcing.",
+    type: "single"
+},
+{
+    domain: "Security Program Management and Oversight",
+    question: "What is the purpose of insider threat awareness programs?",
+    options: [
+        "To identify external attackers",
+        "To educate employees on recognizing and reporting insider threats",
+        "To train users in programming",
+        "To promote social engineering techniques"
+    ],
+    correctAnswer: [1],
+    explanation: "Insider threat awareness programs help employees recognize signs of insider threats and know how to report them.",
+    type: "single"
+}
+
+
+];
+            // Questions will be added here
+
+        // Distribute questions into domains
+        function distributeQuestions() {
+            // Calculate the number of questions per domain
+            domains.forEach(domain => {
+                domain.numQuestions = Math.round(domain.percentage);
+            });
+
+            // Assign questions to domains
+            domains.forEach(domain => {
+                domain.questions = allQuestions.filter(q => q.domain === domain.name).slice(0, domain.numQuestions);
+            });
+
+            // Flatten the questions array
+            domains.forEach(domain => {
+                questions.push(...domain.questions);
+            });
+        }
+
+        distributeQuestions();
+
+        let currentQuestionIndex = 0;
+        const userAnswers = [];
+
+        function showQuestion(index) {
+    const container = document.getElementById('question-container');
+    container.innerHTML = '';
+
+    if (index < questions.length) {
+        const q = questions[index];
+        const questionElem = document.createElement('div');
+        questionElem.className = 'question';
+
+        const questionText = document.createElement('h3');
+        questionText.textContent = `Question ${index + 1}: ${q.question}`;
+        questionElem.appendChild(questionText);
+
+        const optionsList = document.createElement('ul');
+        optionsList.className = 'options';
+
+        q.options.forEach((option, i) => {
+            const optionItem = document.createElement('li');
+
+            const input = document.createElement('input');
+            input.type = q.type === 'multiple' ? 'checkbox' : 'radio';
+            input.name = q.type === 'multiple' ? `option${index}_${i}` : 'option';
+            input.value = i;
+            input.id = `option${index}_${i}`;
+
+            // Preserve user's previous selection
+            if (userAnswers[index] && userAnswers[index].includes(i)) {
+                input.checked = true;
+            }
+
+            const label = document.createElement('label');
+            label.htmlFor = `option${index}_${i}`;
+            label.textContent = option;
+
+            optionItem.appendChild(input);
+            optionItem.appendChild(label);
+            optionsList.appendChild(optionItem);
+        });
+
+        questionElem.appendChild(optionsList);
+        container.appendChild(questionElem);
+
+        // Update navigation buttons
+        document.getElementById('prev-button').disabled = index === 0;
+        document.getElementById('next-button').style.display = index === questions.length - 1 ? 'none' : 'inline-block';
+        document.getElementById('submit-button').style.display = index === questions.length - 1 ? 'inline-block' : 'none';
+    }
+}
+
+
+function saveAnswer() {
+    const q = questions[currentQuestionIndex];
+    let selectedOptions = [];
+
+    if (q.type === 'multiple') {
+        selectedOptions = Array.from(document.querySelectorAll(`input[id^="option${currentQuestionIndex}_"]:checked`)).map(input => parseInt(input.value));
+    } else {
+        const selectedOption = document.querySelector('input[name="option"]:checked');
+        if (selectedOption) {
+            selectedOptions = [parseInt(selectedOption.value)];
+        }
+    }
+
+    userAnswers[currentQuestionIndex] = selectedOptions;
+}
+
+
+        document.getElementById('next-button').addEventListener('click', () => {
+            saveAnswer();
+            currentQuestionIndex++;
+            showQuestion(currentQuestionIndex);
+        });
+
+        document.getElementById('prev-button').addEventListener('click', () => {
+            saveAnswer();
+            currentQuestionIndex--;
+            showQuestion(currentQuestionIndex);
+        });
+
+        document.getElementById('submit-button').addEventListener('click', () => {
+            saveAnswer();
+            showResults();
+        });
+
+        function showResults() {
+    let score = 0;
+    const domainScores = {};
+
+    // Initialize domain scores
+    domains.forEach(domain => {
+        domainScores[domain.name] = { correct: 0, total: domain.questions.length };
+    });
+
+    questions.forEach((q, index) => {
+        const userAns = userAnswers[index] || [];
+        const correctAns = q.correctAnswer;
+
+        // Check if the question is multiple-selection
+        if (q.type === 'multiple') {
+            // All-or-nothing scoring for multiple-selection questions
+            const isCorrect = userAns.length === correctAns.length && userAns.every(val => correctAns.includes(val));
+            if (isCorrect) {
+                score++;
+                domainScores[q.domain].correct++;
+            }
+        } else {
+            // Single-selection question
+            const isCorrect = userAns[0] === correctAns[0];
+            if (isCorrect) {
+                score++;
+                domainScores[q.domain].correct++;
+            }
+        }
+    });
+
+            // Display the results
+            const container = document.getElementById('question-container');
+            container.innerHTML = '';
+
+            const scoreElem = document.createElement('h2');
+            scoreElem.textContent = `Your Score: ${score} out of ${questions.length}`;
+            container.appendChild(scoreElem);
+
+            // Domain breakdown
+            const breakdownElem = document.createElement('div');
+            breakdownElem.className = 'breakdown';
+
+            domains.forEach(domain => {
+                const domainScore = domainScores[domain.name];
+                const percentage = ((domainScore.correct / domainScore.total) * 100).toFixed(2);
+
+                const domainElem = document.createElement('p');
+                domainElem.textContent = `${domain.name}: ${domainScore.correct} out of ${domainScore.total} correct (${percentage}%)`;
+                breakdownElem.appendChild(domainElem);
+            });
+
+            container.appendChild(breakdownElem);
+
+            // Explanations
+            const explanationsElem = document.createElement('div');
+            explanationsElem.className = 'explanations';
+
+            questions.forEach((q, index) => {
+                const userAns = userAnswers[index] || [];
+                const isCorrect = JSON.stringify(userAns.sort()) === JSON.stringify(q.correctAnswer.sort());
+
+                const questionElem = document.createElement('div');
+                questionElem.className = 'explanation';
+
+                const questionText = document.createElement('h3');
+                questionText.textContent = `Question ${index + 1}: ${q.question}`;
+                questionElem.appendChild(questionText);
+
+                const userAnswerText = document.createElement('p');
+                userAnswerText.textContent = `Your Answer: ${userAns.map(i => q.options[i]).join(', ') || 'No answer'}`;
+                questionElem.appendChild(userAnswerText);
+
+                const correctAnswerText = document.createElement('p');
+                correctAnswerText.textContent = `Correct Answer: ${q.correctAnswer.map(i => q.options[i]).join(', ')}`;
+                questionElem.appendChild(correctAnswerText);
+
+                const explanationText = document.createElement('p');
+                explanationText.textContent = q.explanation;
+                questionElem.appendChild(explanationText);
+
+                questionElem.style.backgroundColor = isCorrect ? '#d4edda' : '#f8d7da';
+
+                explanationsElem.appendChild(questionElem);
+            });
+
+            container.appendChild(explanationsElem);
+
+            // Hide navigation buttons
+            document.querySelector('.navigation-buttons').style.display = 'none';
+        }
+
+        // Start the test
+        showQuestion(currentQuestionIndex);
+    </script>
+</body>
+</html>
