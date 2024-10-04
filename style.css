@@ -34,7 +34,7 @@ nav ul {
 }
 
 nav ul li {
-    display: inline;
+    display: inline-block;
     margin: 0 10px;
 }
 
@@ -44,8 +44,9 @@ nav ul li a {
 }
 
 main {
-    padding: 0;
+    padding: 0 10%;
     flex: 1; /* Ensures the main content grows to fill available space */
+    padding-bottom: 60px; /* Push the content above the footer */
 }
 
 section {
@@ -104,19 +105,34 @@ a:hover {
     padding: 20px;
 }
 
+.projects-container h2 {
+    font-size: 28px;
+}
+
+.projects-container p {
+    font-size: 16px;
+    margin-bottom: 30px;
+}
+
+/* Responsive project buttons */
 .project-buttons {
     display: flex;
-    justify-content: space-around;
+    flex-wrap: wrap;
+    justify-content: center;
     margin-bottom: 20px;
+    gap: 20px; /* Add space between buttons */
 }
 
 .project-buttons a {
     padding: 15px 30px;
     border-radius: 20px;
-    font-size: 16px;
+    font-size: 1.2rem; /* Use relative units for scalability */
     text-decoration: none;
     color: white;
     display: inline-block;
+    flex: 1 1 200px; /* Allow buttons to grow and shrink */
+    max-width: 300px;
+    text-align: center;
 }
 
 .project-buttons a.green {
@@ -137,7 +153,9 @@ a:hover {
 
 .project-images {
     display: flex;
-    justify-content: space-around;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px; /* Add space between images */
 }
 
 .project-images .image {
@@ -153,14 +171,40 @@ a:hover {
     transition: 0.3s;
 }
 
+.project-images .image img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
 .project-images .image:hover {
     background-color: #ddd;
 }
 
-/* Ensure footer doesn't overlap the content */
-main {
-    padding-bottom: 60px; /* Push the content above the footer */
+/* Media queries for responsiveness */
+@media screen and (min-width: 768px) {
+    .project-buttons a {
+        font-size: 1.5rem;
+    }
+
+    .project-images .image {
+        width: 250px;
+        height: 200px;
+    }
 }
+
+@media screen and (min-width: 1024px) {
+    .project-buttons a {
+        font-size: 1.8rem;
+    }
+
+    .project-images .image {
+        width: 300px;
+        height: 250px;
+    }
+}
+
+/* Ensure footer doesn't overlap the content */
+/* Already included padding-bottom: 60px; in main */
 
 /* Styles specific to the game page */
 main.game-page {

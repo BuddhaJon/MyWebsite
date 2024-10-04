@@ -2,73 +2,20 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jonathan Rothe's Projects</title>
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="pictures/favicon.png" type="image/x-icon">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-        .projects-container {
-            text-align: center;
-            padding: 20px;
-        }
-        .projects-container h2 {
-            font-size: 28px;
-        }
-        .projects-container p {
-            font-size: 16px;
-            margin-bottom: 30px;
-        }
-        .project-buttons {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 20px;
-        }
-        .project-buttons a {
-            padding: 15px 30px;
-            border-radius: 20px;
-            font-size: 16px;
-            text-decoration: none;
-            color: white;
-            display: inline-block;
-        }
-        .project-buttons a.green {
-            background-color: #28a745;
-        }
-        .project-buttons a.red {
-            background-color: #dc3545;
-        }
-        .project-buttons a.yellow {
-            background-color: #ffc107;
-        }
-        .project-images {
-            display: flex;
-            justify-content: space-around;
-        }
-        .project-images .image {
-            width: 200px;
-            height: 150px;
-            background-color: #ccc;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            color: black;
-            border: 1px solid #ddd;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
     <header>
         <h1>Jonathan Rothe</h1>
         <nav>
-        <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="about.html">About Me</a></li>
-            <li><a href="resume.html">My Resume</a></li>
-        </ul>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About Me</a></li>
+                <li><a href="resume.html">My Resume</a></li>
+            </ul>
         </nav>
     </header>
 
@@ -80,15 +27,21 @@
             <!-- Project buttons as links -->
             <div class="project-buttons">
                 <a href="personal-finance.html" class="green">Personal Finance</a>
-                <a href="video-game.html" class="red">Video Game</a>
+                <a href="video-game.html" class="red">Stress Relief Simulator</a>
                 <a href="cybersecurity-test.html" class="yellow">Cybersecurity Test</a>
             </div>
 
-            <!-- Placeholder images for projects -->
+            <!-- Project images -->
             <div class="project-images">
-                <div class="image">Image</div>
-                <div class="image">Image</div>
-                <div class="image">Image</div>
+                <div class="image">
+                    <img src="personal-finance.png" alt="Personal Finance">
+                </div>
+                <div class="image">
+                    <img src="pictures/game.png" alt="Stress Relief Simulator">
+                </div>
+                <div class="image">
+                    <img src="cybersecurity-test.png" alt="Cybersecurity Test">
+                </div>
             </div>
         </section>
     </main>
