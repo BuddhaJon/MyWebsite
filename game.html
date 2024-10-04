@@ -3,9 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <title>Ragdoll Physics Game</title>
-    <link rel="stylesheet" href="style.css">
     <link rel="icon" href="pictures/favicon.png" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Embedded CSS -->
+    <style>
+        /* Global styles */
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            background-color: #f4f4f4;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 1rem 0;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        nav ul li {
+            display: inline-block;
+            margin: 0 10px;
+        }
+
+        nav ul li a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        footer {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+            width: 100%;
+        }
+
+        /* Styles specific to the game page */
+        main.game-page {
+            padding: 0;
+            margin: 0;
+        }
+
+        #game-container {
+            width: 100%;
+            max-width: 800px;
+            height: 600px;
+            margin: 0 auto;
+            position: relative;
+            background-color: #f4f4f4;
+        }
+
+        #game-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* Control buttons */
+        .button-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .button-container button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .button-container button:hover {
+            background-color: #b32a36;
+        }
+
+        /* Ensure the canvas doesn't overflow */
+        canvas {
+            max-width: 100%;
+            max-height: 100%;
+        }
+    </style>
 </head>
 <body>
     <!-- Consistent header -->
@@ -31,7 +136,7 @@
 
         <!-- Control buttons -->
         <div class="button-container">
-            <button id="play-button">Play</button>
+            <button id="play-button">Pause</button>
             <button id="reset-button">Reset</button>
         </div>
     </main>
@@ -44,20 +149,38 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.17.1/matter.min.js"></script>
     <script>
         // Module aliases
-        const { Engine, Render, Runner, World, Bodies, Body, Constraint, Composite, Mouse, MouseConstraint, Events, Vector } = Matter;
+        const {
+            Engine,
+            Render,
+            Runner,
+            World,
+            Bodies,
+            Body,
+            Constraint,
+            Composite,
+            Mouse,
+            MouseConstraint,
+            Events,
+            Common
+        } = Matter;
 
         // Create engine and world
         const engine = Engine.create();
         const world = engine.world;
 
+        // Get the dimensions of the game container
+        const gameContainer = document.getElementById('game-container');
+        const width = gameContainer.clientWidth;
+        const height = gameContainer.clientHeight;
+
         // Create renderer
         const render = Render.create({
-            element: document.getElementById('game-container'),
+            element: gameContainer,
             canvas: document.getElementById('game-canvas'),
             engine: engine,
             options: {
-                width: window.innerWidth,
-                height: window.innerHeight - document.querySelector('header').offsetHeight - document.querySelector('footer').offsetHeight - 100,
+                width: width,
+                height: height,
                 wireframes: false,
                 background: '#f4f4f4',
             }
@@ -68,11 +191,20 @@
 
         // Create runner
         const runner = Runner.create();
+        Runner.run(runner, engine);
 
         // Variable to store the support constraint
         let supportConstraint;
 
-        // Function to create a ragdoll with stiffer joints and limited movement
+        // Variable to store the ragdoll
+        let ragdoll;
+
+        // Function to normalize angles to the range [-PI, PI]
+        function normalizeAngle(angle) {
+            return Math.atan2(Math.sin(angle), Math.cos(angle));
+        }
+
+        // Function to create a ragdoll with limited joint movement
         function createRagdoll(x, y) {
             const group = Body.nextGroup(true);
 
@@ -122,32 +254,32 @@
             const leftUpperLeg = Bodies.rectangle(x - 15, y + 10, 20, 50, {
                 collisionFilter: { group: group },
                 density: 0.005,
-                friction: 1.0, // Increase friction for stability
+                friction: 1.0,
                 render: { fillStyle: '#8A2BE2' }
             });
 
             const leftLowerLeg = Bodies.rectangle(x - 15, y + 60, 20, 50, {
                 collisionFilter: { group: group },
                 density: 0.005,
-                friction: 1.0, // Increase friction for stability
+                friction: 1.0,
                 render: { fillStyle: '#8A2BE2' }
             });
 
             const rightUpperLeg = Bodies.rectangle(x + 15, y + 10, 20, 50, {
                 collisionFilter: { group: group },
                 density: 0.005,
-                friction: 1.0, // Increase friction for stability
+                friction: 1.0,
                 render: { fillStyle: '#8A2BE2' }
             });
 
             const rightLowerLeg = Bodies.rectangle(x + 15, y + 60, 20, 50, {
                 collisionFilter: { group: group },
                 density: 0.005,
-                friction: 1.0, // Increase friction for stability
+                friction: 1.0,
                 render: { fillStyle: '#8A2BE2' }
             });
 
-            // Create constraints
+            // Create constraints (joints)
             const headToChest = Constraint.create({
                 bodyA: head,
                 pointA: { x: 0, y: 25 },
@@ -240,8 +372,29 @@
 
             // Assemble the ragdoll
             const ragdoll = Composite.create({
-                bodies: [head, chest, leftUpperArm, leftLowerArm, rightUpperArm, rightLowerArm, leftUpperLeg, leftLowerLeg, rightUpperLeg, rightLowerLeg],
-                constraints: [headToChest, chestToLeftUpperArm, leftUpperToLowerArm, chestToRightUpperArm, rightUpperToLowerArm, chestToLeftUpperLeg, leftUpperToLowerLeg, chestToRightUpperLeg, rightUpperToLowerLeg]
+                bodies: [
+                    head,
+                    chest,
+                    leftUpperArm,
+                    leftLowerArm,
+                    rightUpperArm,
+                    rightLowerArm,
+                    leftUpperLeg,
+                    leftLowerLeg,
+                    rightUpperLeg,
+                    rightLowerLeg
+                ],
+                constraints: [
+                    headToChest,
+                    chestToLeftUpperArm,
+                    leftUpperToLowerArm,
+                    chestToRightUpperArm,
+                    rightUpperToLowerArm,
+                    chestToLeftUpperLeg,
+                    leftUpperToLowerLeg,
+                    chestToRightUpperLeg,
+                    rightUpperToLowerLeg
+                ]
             });
 
             // Add support constraint to hold the ragdoll upright
@@ -254,34 +407,107 @@
             });
             Composite.add(ragdoll, supportConstraint);
 
+            // Define joint limits in radians
+            const joints = [
+                {
+                    bodyA: chest,
+                    bodyB: head,
+                    min: Common.degreesToRadians(-30),
+                    max: Common.degreesToRadians(30)
+                },
+                {
+                    bodyA: chest,
+                    bodyB: leftUpperArm,
+                    min: Common.degreesToRadians(-110),
+                    max: Common.degreesToRadians(110)
+                },
+                {
+                    bodyA: leftUpperArm,
+                    bodyB: leftLowerArm,
+                    min: Common.degreesToRadians(0),
+                    max: Common.degreesToRadians(150)
+                },
+                {
+                    bodyA: chest,
+                    bodyB: rightUpperArm,
+                    min: Common.degreesToRadians(-110),
+                    max: Common.degreesToRadians(110)
+                },
+                {
+                    bodyA: rightUpperArm,
+                    bodyB: rightLowerArm,
+                    min: Common.degreesToRadians(0),
+                    max: Common.degreesToRadians(150)
+                },
+                {
+                    bodyA: chest,
+                    bodyB: leftUpperLeg,
+                    min: Common.degreesToRadians(-30),
+                    max: Common.degreesToRadians(90)
+                },
+                {
+                    bodyA: leftUpperLeg,
+                    bodyB: leftLowerLeg,
+                    min: Common.degreesToRadians(0),
+                    max: Common.degreesToRadians(150)
+                },
+                {
+                    bodyA: chest,
+                    bodyB: rightUpperLeg,
+                    min: Common.degreesToRadians(-30),
+                    max: Common.degreesToRadians(90)
+                },
+                {
+                    bodyA: rightUpperLeg,
+                    bodyB: rightLowerLeg,
+                    min: Common.degreesToRadians(0),
+                    max: Common.degreesToRadians(150)
+                }
+            ];
+
+            // Attach joints to the ragdoll for access in the event handler
+            ragdoll.joints = joints;
+
             return ragdoll;
         }
 
         // Create ground
-        const ground = Bodies.rectangle(0, render.options.height, render.options.width * 2, 50, {
+        const ground = Bodies.rectangle(width / 2, height + 25, width, 50, {
             isStatic: true,
             friction: 1.0,
             render: { fillStyle: '#2E8B57' }
         });
 
         // Create walls
-        const wallLeft = Bodies.rectangle(-25, render.options.height / 2, 50, render.options.height, { isStatic: true, render: { visible: false } });
-        const wallRight = Bodies.rectangle(render.options.width + 25, render.options.height / 2, 50, render.options.height, { isStatic: true, render: { visible: false } });
+        const wallLeft = Bodies.rectangle(-25, height / 2, 50, height, {
+            isStatic: true,
+            render: { visible: false }
+        });
+        const wallRight = Bodies.rectangle(width + 25, height / 2, 50, height, {
+            isStatic: true,
+            render: { visible: false }
+        });
 
         // Add objects to the world
         World.add(world, [ground, wallLeft, wallRight]);
 
         // Create boxes
-        for (let i = 0; i < 10; i++) {
-            const box = Bodies.rectangle(Math.random() * render.options.width, Math.random() * render.options.height / 2, 40, 40, {
-                render: { fillStyle: '#D2691E' },
-                friction: 0.5
-            });
+        for (let i = 0; i < 20; i++) {
+            const box = Bodies.rectangle(
+                Math.random() * width,
+                Math.random() * (height / 2),
+                40,
+                40,
+                {
+                    render: { fillStyle: '#D2691E' },
+                    friction: 0.5
+                }
+            );
             World.add(world, box);
         }
 
         // Create ragdoll
-        let ragdoll = createRagdoll(render.options.width / 2, render.options.height - 300);
+        ragdoll = createRagdoll(width / 2, height - 300);
         World.add(world, ragdoll);
 
         // Mouse control
@@ -304,35 +530,35 @@
             }
         });
 
-        // Adjust canvas size on window resize
-        window.addEventListener('resize', () => {
-            const width = window.innerWidth;
-            const height = window.innerHeight - document.querySelector('header').offsetHeight - document.querySelector('footer').offsetHeight - 100;
-            render.canvas.width = width;
-            render.canvas.height = height;
-            render.options.width = width;
-            render.options.height = height;
-            // Update ground and walls
-            Body.setPosition(ground, { x: width / 2, y: height + 25 });
-            Body.setPosition(wallRight, { x: width + 25, y: height / 2 });
-            Body.setVertices(ground, [
-                { x: 0, y: height },
-                { x: width, y: height },
-                { x: width, y: height + 50 },
-                { x: 0, y: height + 50 }
-            ]);
-            Body.setVertices(wallRight, [
-                { x: width, y: 0 },
-                { x: width + 50, y: 0 },
-                { x: width + 50, y: height },
-                { x: width, y: height }
-            ]);
+        // Enforce joint angle limits
+        Events.on(engine, 'beforeUpdate', function(event) {
+            if (ragdoll && ragdoll.joints) {
+                ragdoll.joints.forEach(function(joint) {
+                    let bodyA = joint.bodyA;
+                    let bodyB = joint.bodyB;
+                    let min = joint.min;
+                    let max = joint.max;
+
+                    // Compute the relative angle
+                    let angleA = bodyA.angle;
+                    let angleB = bodyB.angle;
+                    let relativeAngle = normalizeAngle(angleB - angleA);
+
+                    if (relativeAngle < min) {
+                        Body.setAngle(bodyB, angleA + min);
+                        Body.setAngularVelocity(bodyB, bodyA.angularVelocity);
+                    } else if (relativeAngle > max) {
+                        Body.setAngle(bodyB, angleA + max);
+                        Body.setAngularVelocity(bodyB, bodyA.angularVelocity);
+                    }
+                });
+            }
         });
 
         // Control buttons
         const playButton = document.getElementById('play-button');
         const resetButton = document.getElementById('reset-button');
-        let isRunning = false;
+        let isRunning = true;
 
         playButton.addEventListener('click', () => {
             if (isRunning) {
@@ -347,28 +573,38 @@
         });
 
         resetButton.addEventListener('click', () => {
-            // Remove all bodies except static ones (ground and walls)
+            // Clear the world except static bodies
             World.clear(world, false);
+
             // Add ground and walls back
             World.add(world, [ground, wallLeft, wallRight]);
+
             // Add boxes
-            for (let i = 0; i < 10; i++) {
-                const box = Bodies.rectangle(Math.random() * render.options.width, Math.random() * render.options.height / 2, 40, 40, {
-                    render: { fillStyle: '#D2691E' },
-                    friction: 0.5
-                });
+            for (let i = 0; i < 20; i++) {
+                const box = Bodies.rectangle(
+                    Math.random() * width,
+                    Math.random() * (height / 2),
+                    40,
+                    40,
+                    {
+                        render: { fillStyle: '#D2691E' },
+                        friction: 0.5
+                    }
+                );
                 World.add(world, box);
             }
+
             // Create and add ragdoll
-            ragdoll = createRagdoll(render.options.width / 2, render.options.height - 300);
+            ragdoll = createRagdoll(width / 2, height - 300);
             World.add(world, ragdoll);
+
+            // Restart the runner if it was stopped
+            if (!isRunning) {
+                Runner.run(runner, engine);
+                isRunning = true;
+                playButton.textContent = 'Pause';
+            }
         });
-
-        // Start the engine
-        Runner.run(runner, engine);
-        isRunning = true;
-        playButton.textContent = 'Pause';
-
     </script>
 </body>
 </html>

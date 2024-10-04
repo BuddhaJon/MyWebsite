@@ -357,3 +357,64 @@ main.game-page {
 .explanation p {
     margin: 5px 0;
 }
+
+/* Styles specific to the finance tools */
+#finance-tools section {
+    max-width: 600px;
+    margin: 0 auto 40px auto;
+    text-align: center;
+}
+
+#finance-tools form {
+    display: inline-block;
+    text-align: left;
+}
+
+#finance-tools form div {
+    margin-bottom: 10px;
+}
+
+#finance-tools label {
+    display: inline-block;
+    width: 150px;
+}
+
+#finance-tools input[type="number"],
+#finance-tools input[type="text"],
+#finance-tools select {
+    width: 200px;
+}
+
+#finance-tools button {
+    padding: 10px 20px;
+    margin-top: 10px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#finance-tools button:hover {
+    background-color: #218838;
+}
+
+/* Styles for the expense list within the finance tools */
+#finance-tools #expense-list {
+    margin-top: 10px;
+}
+
+#finance-tools #expense-list div {
+    margin-bottom: 5px;
+}
+
+#finance-tools #expense-list input[type="text"],
+#finance-tools #expense-list input[type="number"] {
+    width: 180px;
+}
+
+/* Error message styles within the finance tools */
+#finance-tools .error-message {
+    color: red;
+    font-weight: bold;
+    margin-top: 10px;
+}

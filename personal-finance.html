@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Personal Finance Tools</title>
+    <link rel="stylesheet" href="style.css"> <!-- Importing the global stylesheet -->
+    <link rel="icon" href="pictures/favicon.png" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <!-- Consistent header -->
+    <header>
+        <h1>Jonathan Rothe</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About Me</a></li>
+                <li><a href="resume.html">My Resume</a></li>
+                <li><a href="projects.html">Projects</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Personal Finance Tools</h1>
+        <div id="finance-tools">
+        <!-- Budgeting Tool Section -->
+        <section id="budgeting-tool">
+            <h2>Budgeting Tool</h2>
+            <form id="budget-form">
+                <div>
+                    <label for="income">Monthly Income:</label>
+                    <input type="number" id="income" name="income" required>
+                </div>
+                <div id="expense-list">
+                    <h3>Expenses:</h3>
+                    <!-- Expenses will be added here -->
+                </div>
+                <button type="button" onclick="addExpense()">Add Expense</button>
+                <br>
+                <button type="button" onclick="calculateBudget()">Calculate Budget</button>
+                <p id="budget-error" class="error-message"></p>
+            </form>
+            <p id="budget-result"></p>
+        </section>
+
+        <!-- Interest Calculator Section -->
+        <section id="interest-calculator">
+            <h2>Interest Calculator</h2>
+            <form id="interest-form">
+                <div>
+                    <label for="principal">Principal Amount:</label>
+                    <input type="number" id="principal" name="principal" required>
+                </div>
+                <div>
+                    <label for="rate">Annual Interest Rate (%):</label>
+                    <input type="number" id="rate" name="rate" required>
+                </div>
+                <div>
+                    <label for="years">Number of Years:</label>
+                    <input type="number" id="years" name="years" required>
+                </div>
+                <div>
+                    <label for="compounding">Compounding:</label>
+                    <input type="checkbox" id="compounding" name="compounding" onchange="toggleCompoundingOptions()">
+                </div>
+                <div id="compounding-options" style="display: none;">
+                    <label for="compound-frequency">Compounding Frequency:</label>
+                    <select id="compound-frequency" name="compound-frequency">
+                        <option value="annual">Annually</option>
+                        <option value="monthly">Monthly</option>
+                    </select>
+                </div>
+                <button type="button" onclick="calculateInterest()">Calculate Interest</button>
+                <p id="interest-error" class="error-message"></p>
+            </form>
+            <p id="interest-result"></p>
+        </section>
+
+        <!-- Inflation Calculator Section -->
+        <section id="inflation-calculator">
+            <h2>Inflation Calculator</h2>
+            <form id="inflation-form">
+                <div>
+                    <label for="current-amount">Current Amount:</label>
+                    <input type="number" id="current-amount" name="current-amount" required>
+                </div>
+                <div>
+                    <label for="inflation-years">Number of Years:</label>
+                    <input type="number" id="inflation-years" name="inflation-years" required>
+                </div>
+                <button type="button" onclick="calculateInflation()">Calculate Future Value</button>
+                <p id="inflation-error" class="error-message"></p>
+            </form>
+            <p id="inflation-result"></p>
+        </section>
+        </div>
+    </main>
+
+    <footer>
+        <p>Developed by Jonathan Rothe</p>
+    </footer>
+
+    <!-- JavaScript Functions -->
+    <script>
+        // Helper function to format numbers with commas
+        function formatNumber(num) {
+            return num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        // Budgeting Tool Functions
+        let expenseCount = 0;
+
+        function addExpense() {
+            expenseCount++;
+            const expenseList = document.getElementById('expense-list');
+            const expenseDiv = document.createElement('div');
+            expenseDiv.id = 'expense-' + expenseCount;
+            expenseDiv.innerHTML = `
+                <input type="text" placeholder="Expense Name" id="expense-name-${expenseCount}">
+                <input type="number" placeholder="Amount" id="expense-amount-${expenseCount}">
+                <button type="button" onclick="removeExpense(${expenseCount})">Remove</button>
+            `;
+            expenseList.appendChild(expenseDiv);
+        }
+
+        function removeExpense(id) {
+            const expenseDiv = document.getElementById('expense-' + id);
+            expenseDiv.remove();
+        }
+
+        function calculateBudget() {
+            const incomeInput = document.getElementById('income');
+            const incomeValue = incomeInput.value.replace(/[\$,]/g, '');
+            const income = parseFloat(incomeValue);
+
+            if (isNaN(income) || income < 0) {
+                document.getElementById('budget-error').textContent = 'Please enter a valid income amount.';
+                document.getElementById('budget-result').textContent = '';
+                return;
+            } else {
+                document.getElementById('budget-error').textContent = '';
+            }
+
+            let totalExpenses = 0;
+            let validExpenses = true;
+
+            for (let i = 1; i <= expenseCount; i++) {
+                const expenseAmountInput = document.getElementById('expense-amount-' + i);
+                if (expenseAmountInput) {
+                    const expenseValue = expenseAmountInput.value.replace(/[\$,]/g, '');
+                    const expenseAmount = parseFloat(expenseValue);
+
+                    if (isNaN(expenseAmount) || expenseAmount < 0) {
+                        validExpenses = false;
+                        break;
+                    }
+
+                    totalExpenses += expenseAmount;
+                }
+            }
+
+            if (!validExpenses) {
+                document.getElementById('budget-error').textContent = 'Please enter valid expense amounts.';
+                document.getElementById('budget-result').textContent = '';
+                return;
+            } else {
+                document.getElementById('budget-error').textContent = '';
+            }
+
+            const balance = income - totalExpenses;
+
+            let resultText;
+            if (balance > 0) {
+                resultText = 'You have a surplus of $' + formatNumber(balance) + ' this month.';
+            } else if (balance < 0) {
+                resultText = 'You have a deficit of $' + formatNumber(Math.abs(balance)) + ' this month.';
+            } else {
+                resultText = 'Your budget is balanced this month.';
+            }
+
+            document.getElementById('budget-result').textContent = resultText;
+        }
+
+        // Interest Calculator Functions
+        function toggleCompoundingOptions() {
+            const compounding = document.getElementById('compounding').checked;
+            const optionsDiv = document.getElementById('compounding-options');
+            optionsDiv.style.display = compounding ? 'block' : 'none';
+        }
+
+        function calculateInterest() {
+            const principalInput = document.getElementById('principal');
+            const rateInput = document.getElementById('rate');
+            const yearsInput = document.getElementById('years');
+
+            const principalValue = principalInput.value.replace(/[\$,]/g, '');
+            const rateValue = rateInput.value.replace(/[\$,]/g, '');
+            const yearsValue = yearsInput.value.replace(/[\$,]/g, '');
+
+            const principal = parseFloat(principalValue);
+            const rate = parseFloat(rateValue) / 100;
+            const years = parseFloat(yearsValue);
+
+            if (isNaN(principal) || principal < 0) {
+                document.getElementById('interest-error').textContent = 'Please enter a valid principal amount.';
+                document.getElementById('interest-result').textContent = '';
+                return;
+            }
+
+            if (isNaN(rate) || rate < 0) {
+                document.getElementById('interest-error').textContent = 'Please enter a valid interest rate.';
+                document.getElementById('interest-result').textContent = '';
+                return;
+            }
+
+            if (isNaN(years) || years < 0) {
+                document.getElementById('interest-error').textContent = 'Please enter a valid number of years.';
+                document.getElementById('interest-result').textContent = '';
+                return;
+            }
+
+            document.getElementById('interest-error').textContent = '';
+
+            const compounding = document.getElementById('compounding').checked;
+
+            let amount, interestEarned;
+
+            if (compounding) {
+                const frequency = document.getElementById('compound-frequency').value;
+                let n; // Number of times interest is compounded per year
+                if (frequency === 'monthly') {
+                    n = 12;
+                } else {
+                    n = 1;
+                }
+                amount = principal * Math.pow(1 + rate / n, n * years);
+            } else {
+                amount = principal * (1 + rate * years);
+            }
+
+            interestEarned = amount - principal;
+
+            const resultText = `After ${years} years, your ${compounding ? 'compounded ' : ''}investment will be worth $${formatNumber(amount)}, earning $${formatNumber(interestEarned)} in interest.`;
+            document.getElementById('interest-result').textContent = resultText;
+        }
+
+        // Inflation Calculator Function
+        function calculateInflation() {
+            const currentAmountInput = document.getElementById('current-amount');
+            const yearsInput = document.getElementById('inflation-years');
+
+            const currentAmountValue = currentAmountInput.value.replace(/[\$,]/g, '');
+            const yearsValue = yearsInput.value.replace(/[\$,]/g, '');
+
+            const currentAmount = parseFloat(currentAmountValue);
+            const years = parseFloat(yearsValue);
+
+            if (isNaN(currentAmount) || currentAmount < 0) {
+                document.getElementById('inflation-error').textContent = 'Please enter a valid current amount.';
+                document.getElementById('inflation-result').textContent = '';
+                return;
+            }
+
+            if (isNaN(years) || years < 0) {
+                document.getElementById('inflation-error').textContent = 'Please enter a valid number of years.';
+                document.getElementById('inflation-result').textContent = '';
+                return;
+            }
+
+            document.getElementById('inflation-error').textContent = '';
+
+            const averageInflationRate = 0.03; // Estimated average inflation rate (3%)
+
+            const futureValue = currentAmount * Math.pow(1 + averageInflationRate, years);
+
+            const resultText = `In ${years} years, $${formatNumber(currentAmount)} will be equivalent to $${formatNumber(futureValue)} due to estimated inflation.`;
+            document.getElementById('inflation-result').textContent = resultText;
+        }
+    </script>
+</body>
+</html>
