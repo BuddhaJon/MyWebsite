@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Page</title>
+    <link rel="stylesheet" href="style.css"> <!-- Use the external stylesheet -->
+    <link rel="icon" href="pictures/favicon.png" type="image/x-icon">
+</head>
+<body>
+    <!-- Consistent header as in other pages -->
+    <header>
+        <h1>Jonathan Rothe</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About Me</a></li>
+                <li><a href="resume.html">My Resume</a></li>
+                <li><a href="projects.html">Projects</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="game-page">
+        <h1>Game Title</h1>
+
+        <!-- Game area placeholder -->
+        <div id="game-container">
+            <!-- Set width and height attributes to match the Matter.js render dimensions -->
+            <canvas id="game-canvas" width="800" height="800"></canvas>
+        </div>
+
+        <!-- Control buttons -->
+        <div class="button-container">
+            <button id="play-button">Play</button>
+            <button id="reset-button">Reset</button>
+        </div>
+    </main>
+
+    <footer>
+        <p>Developed by Jonathan Rothe</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.17.1/matter.min.js"></script>
+    <script>
+        const playButton = document.getElementById('play-button');
+        const resetButton = document.getElementById('reset-button');
+        let isPlaying = false;
+
+        // Setup for Matter.js Game
+        const { Engine, Render, Runner, Bodies, World, Events, Body, Vector, Composite, Composites } = Matter;
+
+        let engine;
+        let world;
+        let render;
+        let runner;
+        let ground;
+        let wall;
+        const minBlockSize = 10; // Minimum size before a block disappears
+
+        function initGame() {
+            // Create a new engine and world
+            engine = Engine.create();
+            world = engine.world;
+
+            // Rendering setup
+            render = Render.create({
+                element: document.getElementById('game-container'),
+                canvas: document.getElementById('game-canvas'),
+                engine: engine,
+                options: {
+                    width: 800,
+                    height: 800,
+                    wireframes: false,
+                    background: '#ccc'
+                }
+            });
+
+            Render.run(render);
+            runner = Runner.create();
+            Runner.run(runner, engine);
+
+            // Ground
+            ground = Bodies.rectangle(400, 790, 810, 20, { isStatic: true });
+
+            // Create a wall of blocks
+            const blockSize = 40;
+            const columns = 10;
+            const rows = 10;
+            const startX = 200;
+            const totalBlockHeight = rows * blockSize;
+            const startY = 780 - totalBlockHeight; // Adjusted to position blocks above ground
+
+            wall = Composites.stack(startX, startY, columns, rows, 0, 0, function(x, y) {
+                const color = getRandomColor();
+                const block = Bodies.rectangle(x, y, blockSize, blockSize, {
+                    render: {
+                        fillStyle: color
+                    }
+                });
+                block.initialSize = blockSize; // Store the initial size
+                block.blockColor = color; // Store the block's color for fragments
+                return block;
+            });
+
+            World.add(world, [ground, wall]);
+
+            // Listen for mouse clicks on the canvas to apply explosions
+            render.canvas.addEventListener('mousedown', handleCanvasClick);
+
+            // Remove blocks that go off-screen
+            Events.on(engine, "afterUpdate", removeOffScreenBodies);
+        }
+
+        function startGame() {
+            Runner.start(runner, engine);
+            isPlaying = true;
+            playButton.textContent = 'Pause';
+        }
+
+        function pauseGame() {
+            Runner.stop(runner);
+            isPlaying = false;
+            playButton.textContent = 'Play';
+        }
+
+        function resetGame() {
+            // Clear the world and engine
+            World.clear(world);
+            Engine.clear(engine);
+
+            // Stop the runner
+            Runner.stop(runner);
+
+            // Remove all event listeners
+            render.canvas.removeEventListener('mousedown', handleCanvasClick);
+
+            // Re-initialize the game
+            initGame();
+
+            // Start the game if it was playing
+            if (isPlaying) {
+                startGame();
+            }
+        }
+
+        function applyExplosion(point) {
+            const explosionRadius = 200;
+            const forceMagnitude = 0.05;
+
+            // Add explosion visual effect
+            createExplosionEffect(point);
+
+            const bodies = Composite.allBodies(world);
+
+            bodies.forEach(body => {
+                if (body.isStatic) return;
+
+                const distanceVector = Vector.sub(body.position, point);
+                const distance = Vector.magnitude(distanceVector);
+
+                // Apply force if the body is within the explosion radius
+                if (distance < explosionRadius) {
+                    const forceDirection = Vector.normalise(distanceVector);
+                    const force = Vector.mult(
+                        forceDirection,
+                        forceMagnitude * (1 - distance / explosionRadius)
+                    );
+
+                    Body.applyForce(body, body.position, force);
+
+                    // Fragment the block into three smaller blocks if it's close enough
+                    if (distance < explosionRadius / 2) {
+                        fragmentBody(body);
+                    }
+                }
+            });
+        }
+
+        function createExplosionEffect(point) {
+            const explosion = document.createElement('div');
+            explosion.className = 'explosion';
+
+            // Position explosion relative to game-container
+            explosion.style.left = `${point.x}px`;
+            explosion.style.top = `${point.y}px`;
+
+            // Append explosion effect to game container
+            document.getElementById('game-container').appendChild(explosion);
+
+            // Remove the explosion effect after the animation ends
+            setTimeout(() => {
+                explosion.remove();
+            }, 500);
+        }
+
+        function fragmentBody(body) {
+            const currentWidth = body.bounds.max.x - body.bounds.min.x;
+            const currentHeight = body.bounds.max.y - body.bounds.min.y;
+
+            // Remove the original body
+            World.remove(world, body);
+
+            // Calculate the size of the fragments
+            const fragmentWidth = currentWidth / 2;
+            const fragmentHeight = currentHeight / 2;
+
+            // Remove the block if it's too small to fragment further
+            if (fragmentWidth < minBlockSize || fragmentHeight < minBlockSize) {
+                return;
+            }
+
+            // Create three fragments
+            const fragments = [];
+
+            for (let i = 0; i < 3; i++) {
+                const fragment = Bodies.rectangle(
+                    body.position.x + (Math.random() - 0.5) * currentWidth,
+                    body.position.y + (Math.random() - 0.5) * currentHeight,
+                    fragmentWidth,
+                    fragmentHeight,
+                    {
+                        restitution: body.restitution,
+                        friction: body.friction,
+                        render: {
+                            fillStyle: body.blockColor // Use the parent block's color
+                        }
+                    }
+                );
+
+                // Apply a slight random velocity to the fragments
+                Body.setVelocity(fragment, {
+                    x: body.velocity.x + (Math.random() - 0.5) * 2,
+                    y: body.velocity.y + (Math.random() - 0.5) * 2
+                });
+
+                fragments.push(fragment);
+            }
+
+            // Add fragments to the world
+            World.add(world, fragments);
+        }
+
+        function handleCanvasClick(event) {
+            // Get mouse position relative to canvas
+            const rect = render.canvas.getBoundingClientRect();
+            const scaleX = render.canvas.width / rect.width;
+            const scaleY = render.canvas.height / rect.height;
+            const x = (event.clientX - rect.left) * scaleX;
+            const y = (event.clientY - rect.top) * scaleY;
+
+            const explosionPoint = { x: x, y: y };
+            applyExplosion(explosionPoint);
+        }
+
+        function removeOffScreenBodies() {
+            const bodies = Composite.allBodies(world);
+
+            bodies.forEach(body => {
+                if (
+                    body.position.y > 820 ||
+                    body.position.x < -20 ||
+                    body.position.x > 820
+                ) {
+                    World.remove(world, body);
+                }
+            });
+        }
+
+        // Function to generate a random color
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        // Event listeners for buttons
+        playButton.addEventListener('click', function() {
+            if (isPlaying) {
+                pauseGame();
+            } else {
+                startGame();
+            }
+        });
+
+        resetButton.addEventListener('click', function() {
+            resetGame();
+        });
+
+        // Initialize the game for the first time
+        initGame();
+        pauseGame(); // Start in paused state
+    </script>
+</body>
+</html>
