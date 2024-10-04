@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Page</title>
+    <title>Stress Relief Simulator</title>
     <link rel="stylesheet" href="style.css"> <!-- Use the external stylesheet -->
     <link rel="icon" href="pictures/favicon.png" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
     <!-- Consistent header as in other pages -->
@@ -22,12 +22,18 @@
     </header>
 
     <main class="game-page">
-        <h1>Game Title</h1>
+        <h1>Stress Relief Simulator</h1>
+
+        <!-- Explosion power control -->
+        <div class="slider-container">
+            <label for="explosion-power">Explosion Power:</label>
+            <input type="range" id="explosion-power" min="50" max="500" value="200">
+        </div>
 
         <!-- Game area placeholder -->
         <div id="game-container">
-            <!-- Set width and height attributes to match the Matter.js render dimensions -->
-            <canvas id="game-canvas" width="800" height="800"></canvas>
+            <!-- Canvas will be dynamically sized -->
+            <canvas id="game-canvas"></canvas>
         </div>
 
         <!-- Control buttons -->
@@ -45,51 +51,57 @@
     <script>
         const playButton = document.getElementById('play-button');
         const resetButton = document.getElementById('reset-button');
+        const explosionPowerSlider = document.getElementById('explosion-power');
         let isPlaying = false;
 
         // Setup for Matter.js Game
         const { Engine, Render, Runner, Bodies, World, Events, Body, Vector, Composite, Composites } = Matter;
 
-        let engine;
-        let world;
-        let render;
-        let runner;
+        // Create the engine and world outside initGame
+        let engine = Engine.create();
+        let world = engine.world;
+
+        // Create render and runner outside initGame
+        let renderOptions = {
+            element: document.getElementById('game-container'),
+            canvas: document.getElementById('game-canvas'),
+            engine: engine,
+            options: {
+                wireframes: false,
+                background: '#ccc',
+                // We'll set width and height dynamically
+            }
+        };
+
+        let render = Render.create(renderOptions);
+
+        let runner = Runner.create();
+
         let ground;
         let wall;
-        const minBlockSize = 10; // Minimum size before a block disappears
+        const minBlockSize = 5; // Reduced minimum size to allow blocks to fragment further
 
         function initGame() {
-            // Create a new engine and world
-            engine = Engine.create();
-            world = engine.world;
+            // Clear the world
+            World.clear(world);
+            Engine.clear(engine);
 
-            // Rendering setup
-            render = Render.create({
-                element: document.getElementById('game-container'),
-                canvas: document.getElementById('game-canvas'),
-                engine: engine,
-                options: {
-                    width: 800,
-                    height: 800,
-                    wireframes: false,
-                    background: '#ccc'
-                }
-            });
-
-            Render.run(render);
-            runner = Runner.create();
-            Runner.run(runner, engine);
+            // Adjust canvas size
+            resizeCanvas();
 
             // Ground
-            ground = Bodies.rectangle(400, 790, 810, 20, { isStatic: true });
+            const canvasWidth = render.canvas.width;
+            const canvasHeight = render.canvas.height;
+            ground = Bodies.rectangle(canvasWidth / 2, canvasHeight - 10, canvasWidth + 20, 20, { isStatic: true });
 
             // Create a wall of blocks
             const blockSize = 40;
             const columns = 10;
             const rows = 10;
-            const startX = 200;
+            const totalBlockWidth = columns * blockSize;
             const totalBlockHeight = rows * blockSize;
-            const startY = 780 - totalBlockHeight; // Adjusted to position blocks above ground
+            const startX = (canvasWidth - totalBlockWidth) / 2;
+            const startY = canvasHeight - totalBlockHeight - 20; // Position blocks above the ground
 
             wall = Composites.stack(startX, startY, columns, rows, 0, 0, function(x, y) {
                 const color = getRandomColor();
@@ -105,35 +117,31 @@
 
             World.add(world, [ground, wall]);
 
-            // Listen for mouse clicks on the canvas to apply explosions
-            render.canvas.addEventListener('mousedown', handleCanvasClick);
-
             // Remove blocks that go off-screen
             Events.on(engine, "afterUpdate", removeOffScreenBodies);
+
+            // Render the initial scene
+            Render.world(render);
         }
 
         function startGame() {
             Runner.start(runner, engine);
+            Render.run(render);
             isPlaying = true;
             playButton.textContent = 'Pause';
         }
 
         function pauseGame() {
             Runner.stop(runner);
+            Render.stop(render);
             isPlaying = false;
             playButton.textContent = 'Play';
         }
 
         function resetGame() {
-            // Clear the world and engine
-            World.clear(world);
-            Engine.clear(engine);
-
-            // Stop the runner
+            // Stop the runner and renderer
             Runner.stop(runner);
-
-            // Remove all event listeners
-            render.canvas.removeEventListener('mousedown', handleCanvasClick);
+            Render.stop(render);
 
             // Re-initialize the game
             initGame();
@@ -145,11 +153,11 @@
         }
 
         function applyExplosion(point) {
-            const explosionRadius = 200;
-            const forceMagnitude = 0.05;
+            const explosionRadius = parseInt(explosionPowerSlider.value); // Use value from slider
+            const forceMagnitude = explosionRadius / 4000; // Adjusted force based on explosion radius
 
             // Add explosion visual effect
-            createExplosionEffect(point);
+            createExplosionEffect(point, explosionRadius);
 
             const bodies = Composite.allBodies(world);
 
@@ -177,21 +185,47 @@
             });
         }
 
-        function createExplosionEffect(point) {
-            const explosion = document.createElement('div');
-            explosion.className = 'explosion';
+        function createExplosionEffect(point, explosionRadius) {
+            const particleCount = Math.floor(explosionRadius / 2); // More particles with higher power
+            const gameContainer = document.getElementById('game-container');
+            const gameContainerRect = gameContainer.getBoundingClientRect();
+            const x = point.x * (gameContainerRect.width / render.canvas.width);
+            const y = point.y * (gameContainerRect.height / render.canvas.height);
 
-            // Position explosion relative to game-container
-            explosion.style.left = `${point.x}px`;
-            explosion.style.top = `${point.y}px`;
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
 
-            // Append explosion effect to game container
-            document.getElementById('game-container').appendChild(explosion);
+                // Position particle at explosion point
+                particle.style.left = `${x}px`;
+                particle.style.top = `${y}px`;
 
-            // Remove the explosion effect after the animation ends
-            setTimeout(() => {
-                explosion.remove();
-            }, 500);
+                // Random velocity and angle
+                const angle = Math.random() * 2 * Math.PI;
+                const speed = Math.random() * explosionRadius / 2 + explosionRadius / 2; // Speed adjusted based on explosion radius
+
+                const velocityX = Math.cos(angle) * speed;
+                const velocityY = Math.sin(angle) * speed;
+
+                // Set custom properties to control animation
+                particle.style.setProperty('--move-x', `${velocityX}px`);
+                particle.style.setProperty('--move-y', `${velocityY}px`);
+                particle.style.setProperty('--rotation', `${Math.random() * 360}deg`);
+                particle.style.setProperty('--scale', `${Math.random() * 0.5 + 0.5}`);
+
+                // Randomize particle color
+                const colors = ['#FF4500', '#FFA500', '#FFD700', '#FFFF00', '#808080', '#FF69B4', '#00FFFF', '#ADFF2F'];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.backgroundColor = color;
+
+                // Append particle to game container
+                gameContainer.appendChild(particle);
+
+                // Remove particle after animation
+                setTimeout(() => {
+                    particle.remove();
+                }, 1000); // Duration matches the CSS animation
+            }
         }
 
         function fragmentBody(body) {
@@ -207,6 +241,7 @@
 
             // Remove the block if it's too small to fragment further
             if (fragmentWidth < minBlockSize || fragmentHeight < minBlockSize) {
+                // Instead of returning, we remove the body completely
                 return;
             }
 
@@ -227,6 +262,7 @@
                         }
                     }
                 );
+                fragment.blockColor = body.blockColor; // Ensure fragments carry the blockColor
 
                 // Apply a slight random velocity to the fragments
                 Body.setVelocity(fragment, {
@@ -258,9 +294,9 @@
 
             bodies.forEach(body => {
                 if (
-                    body.position.y > 820 ||
-                    body.position.x < -20 ||
-                    body.position.x > 820
+                    body.position.y > render.canvas.height + 100 ||
+                    body.position.x < -100 ||
+                    body.position.x > render.canvas.width + 100
                 ) {
                     World.remove(world, body);
                 }
@@ -275,6 +311,25 @@
                 color += letters[Math.floor(Math.random() * 16)];
             }
             return color;
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            // Re-render the scene
+            Render.world(render);
+        });
+
+        function resizeCanvas() {
+            const gameContainer = document.getElementById('game-container');
+            const width = gameContainer.clientWidth;
+            const height = window.innerHeight - gameContainer.getBoundingClientRect().top - 150; // Adjust as needed
+
+            render.canvas.width = width;
+            render.canvas.height = height;
+
+            render.options.width = width;
+            render.options.height = height;
         }
 
         // Event listeners for buttons
@@ -293,6 +348,9 @@
         // Initialize the game for the first time
         initGame();
         pauseGame(); // Start in paused state
+
+        // Listen for mouse clicks on the canvas to apply explosions
+        render.canvas.addEventListener('mousedown', handleCanvasClick);
     </script>
 </body>
 </html>
