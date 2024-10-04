@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ragdoll Physics Game</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="pictures/favicon.png" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <!-- Consistent header -->
+    <header>
+        <h1>Jonathan Rothe</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About Me</a></li>
+                <li><a href="resume.html">My Resume</a></li>
+                <li><a href="projects.html">Projects</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="game-page">
+        <h1>Ragdoll Physics Game</h1>
+
+        <!-- Game area -->
+        <div id="game-container">
+            <canvas id="game-canvas"></canvas>
+        </div>
+
+        <!-- Control buttons -->
+        <div class="button-container">
+            <button id="play-button">Play</button>
+            <button id="reset-button">Reset</button>
+        </div>
+    </main>
+
+    <footer>
+        <p>Developed by Jonathan Rothe</p>
+    </footer>
+
+    <!-- Matter.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.17.1/matter.min.js"></script>
+    <script>
+        // Module aliases
+        const { Engine, Render, Runner, World, Bodies, Body, Constraint, Composite, Mouse, MouseConstraint, Events, Vector } = Matter;
+
+        // Create engine and world
+        const engine = Engine.create();
+        const world = engine.world;
+
+        // Create renderer
+        const render = Render.create({
+            element: document.getElementById('game-container'),
+            canvas: document.getElementById('game-canvas'),
+            engine: engine,
+            options: {
+                width: window.innerWidth,
+                height: window.innerHeight - document.querySelector('header').offsetHeight - document.querySelector('footer').offsetHeight - 100,
+                wireframes: false,
+                background: '#f4f4f4',
+            }
+        });
+
+        // Run the renderer
+        Render.run(render);
+
+        // Create runner
+        const runner = Runner.create();
+
+        // Variable to store the support constraint
+        let supportConstraint;
+
+        // Function to create a ragdoll with stiffer joints and limited movement
+        function createRagdoll(x, y) {
+            const group = Body.nextGroup(true);
+
+            // Create body parts
+            const head = Bodies.circle(x, y - 100, 20, {
+                collisionFilter: { group: group },
+                density: 0.005,
+                friction: 0.9,
+                render: { fillStyle: '#FFB6C1' }
+            });
+
+            const chest = Bodies.rectangle(x, y - 50, 40, 60, {
+                collisionFilter: { group: group },
+                density: 0.005,
+                friction: 0.9,
+                render: { fillStyle: '#87CEFA' }
+            });
+
+            const leftUpperArm = Bodies.rectangle(x - 35, y - 50, 20, 40, {
+                collisionFilter: { group: group },
+                density: 0.005,
+                friction: 0.9,
+                render: { fillStyle: '#FFD700' }
+            });
+
+            const leftLowerArm = Bodies.rectangle(x - 35, y - 20, 20, 40, {
+                collisionFilter: { group: group },
+                density: 0.005,
+                friction: 0.9,
+                render: { fillStyle: '#FFD700' }
+            });
+
+            const rightUpperArm = Bodies.rectangle(x + 35, y - 50, 20, 40, {
+                collisionFilter: { group: group },
+                density: 0.005,
+                friction: 0.9,
+                render: { fillStyle: '#FFD700' }
+            });
+
+            const rightLowerArm = Bodies.rectangle(x + 35, y - 20, 20, 40, {
+                collisionFilter: { group: group },
+                density: 0.005,
+                friction: 0.9,
+                render: { fillStyle: '#FFD700' }
+            });
+
+            const leftUpperLeg = Bodies.rectangle(x - 15, y + 10, 20, 50, {
+                collisionFilter: { group: group },
+                density: 0.005,
+                friction: 1.0, // Increase friction for stability
+                render: { fillStyle: '#8A2BE2' }
+            });
+
+            const leftLowerLeg = Bodies.rectangle(x - 15, y + 60, 20, 50, {
+                collisionFilter: { group: group },
+                density: 0.005,
+                friction: 1.0, // Increase friction for stability
+                render: { fillStyle: '#8A2BE2' }
+            });
+
+            const rightUpperLeg = Bodies.rectangle(x + 15, y + 10, 20, 50, {
+                collisionFilter: { group: group },
+                density: 0.005,
+                friction: 1.0, // Increase friction for stability
+                render: { fillStyle: '#8A2BE2' }
+            });
+
+            const rightLowerLeg = Bodies.rectangle(x + 15, y + 60, 20, 50, {
+                collisionFilter: { group: group },
+                density: 0.005,
+                friction: 1.0, // Increase friction for stability
+                render: { fillStyle: '#8A2BE2' }
+            });
+
+            // Create constraints
+            const headToChest = Constraint.create({
+                bodyA: head,
+                pointA: { x: 0, y: 25 },
+                bodyB: chest,
+                pointB: { x: 0, y: -30 },
+                stiffness: 1,
+                length: 0,
+                render: { visible: false }
+            });
+
+            const chestToLeftUpperArm = Constraint.create({
+                bodyA: chest,
+                pointA: { x: -20, y: -20 },
+                bodyB: leftUpperArm,
+                pointB: { x: 0, y: -20 },
+                stiffness: 1,
+                length: 0,
+                render: { visible: false }
+            });
+
+            const leftUpperToLowerArm = Constraint.create({
+                bodyA: leftUpperArm,
+                pointA: { x: 0, y: 20 },
+                bodyB: leftLowerArm,
+                pointB: { x: 0, y: -20 },
+                stiffness: 1,
+                length: 0,
+                render: { visible: false }
+            });
+
+            const chestToRightUpperArm = Constraint.create({
+                bodyA: chest,
+                pointA: { x: 20, y: -20 },
+                bodyB: rightUpperArm,
+                pointB: { x: 0, y: -20 },
+                stiffness: 1,
+                length: 0,
+                render: { visible: false }
+            });
+
+            const rightUpperToLowerArm = Constraint.create({
+                bodyA: rightUpperArm,
+                pointA: { x: 0, y: 20 },
+                bodyB: rightLowerArm,
+                pointB: { x: 0, y: -20 },
+                stiffness: 1,
+                length: 0,
+                render: { visible: false }
+            });
+
+            const chestToLeftUpperLeg = Constraint.create({
+                bodyA: chest,
+                pointA: { x: -10, y: 30 },
+                bodyB: leftUpperLeg,
+                pointB: { x: 0, y: -25 },
+                stiffness: 1,
+                length: 0,
+                render: { visible: false }
+            });
+
+            const leftUpperToLowerLeg = Constraint.create({
+                bodyA: leftUpperLeg,
+                pointA: { x: 0, y: 25 },
+                bodyB: leftLowerLeg,
+                pointB: { x: 0, y: -25 },
+                stiffness: 1,
+                length: 0,
+                render: { visible: false }
+            });
+
+            const chestToRightUpperLeg = Constraint.create({
+                bodyA: chest,
+                pointA: { x: 10, y: 30 },
+                bodyB: rightUpperLeg,
+                pointB: { x: 0, y: -25 },
+                stiffness: 1,
+                length: 0,
+                render: { visible: false }
+            });
+
+            const rightUpperToLowerLeg = Constraint.create({
+                bodyA: rightUpperLeg,
+                pointA: { x: 0, y: 25 },
+                bodyB: rightLowerLeg,
+                pointB: { x: 0, y: -25 },
+                stiffness: 1,
+                length: 0,
+                render: { visible: false }
+            });
+
+            // Assemble the ragdoll
+            const ragdoll = Composite.create({
+                bodies: [head, chest, leftUpperArm, leftLowerArm, rightUpperArm, rightLowerArm, leftUpperLeg, leftLowerLeg, rightUpperLeg, rightLowerLeg],
+                constraints: [headToChest, chestToLeftUpperArm, leftUpperToLowerArm, chestToRightUpperArm, rightUpperToLowerArm, chestToLeftUpperLeg, leftUpperToLowerLeg, chestToRightUpperLeg, rightUpperToLowerLeg]
+            });
+
+            // Add support constraint to hold the ragdoll upright
+            supportConstraint = Constraint.create({
+                pointA: { x: x, y: y - 200 },
+                bodyB: chest,
+                pointB: { x: 0, y: -30 },
+                stiffness: 1,
+                render: { visible: false }
+            });
+            Composite.add(ragdoll, supportConstraint);
+
+            return ragdoll;
+        }
+
+        // Create ground
+        const ground = Bodies.rectangle(0, render.options.height, render.options.width * 2, 50, {
+            isStatic: true,
+            friction: 1.0,
+            render: { fillStyle: '#2E8B57' }
+        });
+
+        // Create walls
+        const wallLeft = Bodies.rectangle(-25, render.options.height / 2, 50, render.options.height, { isStatic: true, render: { visible: false } });
+        const wallRight = Bodies.rectangle(render.options.width + 25, render.options.height / 2, 50, render.options.height, { isStatic: true, render: { visible: false } });
+
+        // Add objects to the world
+        World.add(world, [ground, wallLeft, wallRight]);
+
+        // Create boxes
+        for (let i = 0; i < 10; i++) {
+            const box = Bodies.rectangle(Math.random() * render.options.width, Math.random() * render.options.height / 2, 40, 40, {
+                render: { fillStyle: '#D2691E' },
+                friction: 0.5
+            });
+            World.add(world, box);
+        }
+
+        // Create ragdoll
+        let ragdoll = createRagdoll(render.options.width / 2, render.options.height - 300);
+        World.add(world, ragdoll);
+
+        // Mouse control
+        const mouse = Mouse.create(render.canvas);
+        const mouseConstraint = MouseConstraint.create(engine, {
+            mouse: mouse,
+            constraint: {
+                stiffness: 0.2,
+                render: { visible: false },
+            }
+        });
+        World.add(world, mouseConstraint);
+        render.mouse = mouse;
+
+        // Remove support constraint on interaction
+        Events.on(mouseConstraint, 'startdrag', function(event) {
+            if (supportConstraint) {
+                Composite.remove(ragdoll, supportConstraint);
+                supportConstraint = null;
+            }
+        });
+
+        // Adjust canvas size on window resize
+        window.addEventListener('resize', () => {
+            const width = window.innerWidth;
+            const height = window.innerHeight - document.querySelector('header').offsetHeight - document.querySelector('footer').offsetHeight - 100;
+            render.canvas.width = width;
+            render.canvas.height = height;
+            render.options.width = width;
+            render.options.height = height;
+            // Update ground and walls
+            Body.setPosition(ground, { x: width / 2, y: height + 25 });
+            Body.setPosition(wallRight, { x: width + 25, y: height / 2 });
+            Body.setVertices(ground, [
+                { x: 0, y: height },
+                { x: width, y: height },
+                { x: width, y: height + 50 },
+                { x: 0, y: height + 50 }
+            ]);
+            Body.setVertices(wallRight, [
+                { x: width, y: 0 },
+                { x: width + 50, y: 0 },
+                { x: width + 50, y: height },
+                { x: width, y: height }
+            ]);
+        });
+
+        // Control buttons
+        const playButton = document.getElementById('play-button');
+        const resetButton = document.getElementById('reset-button');
+        let isRunning = false;
+
+        playButton.addEventListener('click', () => {
+            if (isRunning) {
+                Runner.stop(runner);
+                playButton.textContent = 'Play';
+                isRunning = false;
+            } else {
+                Runner.run(runner, engine);
+                playButton.textContent = 'Pause';
+                isRunning = true;
+            }
+        });
+
+        resetButton.addEventListener('click', () => {
+            // Remove all bodies except static ones (ground and walls)
+            World.clear(world, false);
+            // Add ground and walls back
+            World.add(world, [ground, wallLeft, wallRight]);
+            // Add boxes
+            for (let i = 0; i < 10; i++) {
+                const box = Bodies.rectangle(Math.random() * render.options.width, Math.random() * render.options.height / 2, 40, 40, {
+                    render: { fillStyle: '#D2691E' },
+                    friction: 0.5
+                });
+                World.add(world, box);
+            }
+            // Create and add ragdoll
+            ragdoll = createRagdoll(render.options.width / 2, render.options.height - 300);
+            World.add(world, ragdoll);
+        });
+
+        // Start the engine
+        Runner.run(runner, engine);
+        isRunning = true;
+        playButton.textContent = 'Pause';
+
+    </script>
+</body>
+</html>

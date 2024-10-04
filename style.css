@@ -147,6 +147,10 @@ a:hover {
     background-color: #ffc107;
 }
 
+.project-buttons a.blue {
+    background-color: #0f07ff;
+}
+
 .project-buttons a:hover {
     opacity: 0.9;
 }
