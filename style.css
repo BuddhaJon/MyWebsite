@@ -1,282 +1,309 @@
 /* Global styles */
+
+/* Reset margin and padding for html and body, and set full height */
 html, body {
     height: 100%; /* Ensure the body and html elements fill the screen height */
     margin: 0;
     padding: 0;
 }
 
+/* Set base font and layout for the body */
 body {
     font-family: Arial, sans-serif;
     display: flex;
     flex-direction: column; /* Enables flexbox layout for the entire body */
-    min-height: 100vh; /* Ensure the body takes up the full height of the viewport */
-    background-color: #f4f4f4;
-}
-
-header {
-    background-color: #333;
-    color: #fff;
-    padding: 1rem 0;
+    min-height: 100vh; /* Ensure the body takes up at least the full height of the viewport */
+    background-color: #f4f4f4; /* Light gray background color */
     text-align: center;
 }
 
-header h1 {
-    margin: 0;
+/* Header styles */
+header {
+    background-color: #333; /* Dark background color */
+    color: #fff; /* White text color */
+    padding: 1rem 0; /* Vertical padding */
+    text-align: center; /* Center-align text */
 }
 
+header h1 {
+    margin: 0; /* Remove default margin */
+}
+
+/* Center-align headings */
 h1, h2, h3 {
     text-align: center;
 }
 
+
+/* Navigation menu styles */
 nav ul {
-    list-style: none;
-    padding: 0;
+    list-style: none; /* Remove bullet points */
+    padding: 0; /* Remove default padding */
 }
 
 nav ul li {
-    display: inline-block;
-    margin: 0 10px;
+    display: inline-block; /* Display list items horizontally */
+    margin: 0 10px; /* Horizontal spacing between menu items */
 }
 
 nav ul li a {
-    color: #fff;
-    text-decoration: none;
+    color: #fff; /* White text color */
+    text-decoration: none; /* Remove underline from links */
 }
 
+/* Main content area styles */
 main {
-    padding: 0 10%;
-    flex: 1; /* Ensures the main content grows to fill available space */
-    padding-bottom: 60px; /* Push the content above the footer */
+    padding: 0 10%; /* Horizontal padding (10% of viewport width on each side) */
+    flex: 1; /* Allows main to grow and fill available space */
+    padding-bottom: 60px; /* Additional padding at the bottom to prevent content overlap with footer */
 }
 
+/* General section styles */
 section {
-    margin-bottom: 40px;
+    margin-bottom: 40px; /* Spacing below each section */
 }
 
+/* Footer styles */
 footer {
-    background-color: #333;
-    color: #fff;
-    text-align: center;
-    padding: 10px 0;
-    width: 100%;
-    position: relative;
+    background-color: #333; /* Dark background color */
+    color: #fff; /* White text color */
+    text-align: center; /* Center-align text */
+    padding: 10px 0; /* Vertical padding */
+    width: 100%; /* Full width */
+    position: relative; /* Positioning context for any absolutely positioned child elements */
 }
 
-/* Ensure images and videos are responsive */
+/* Responsive images and videos */
 .responsive-image, .responsive-video {
     display: block;
     margin-left: auto;
     margin-right: auto;
-    max-width: 100%;
-    height: auto;
-    padding: 50px 0;
+    max-width: 100%; /* Image/video will not exceed the container's width */
+    height: auto; /* Height adjusts to maintain aspect ratio */
+    padding: 50px 0; /* Vertical padding */
 }
 
+/* Link styles */
 a {
-    color: #007BFF;
+    color: #007BFF; /* Blue text color for links */
 }
 
 a:hover {
-    text-decoration: underline;
+    text-decoration: underline; /* Underline text on hover */
 }
 
+/* Download section styles */
 #download {
-    text-align: center;
-    margin-bottom: 20px;
+    text-align: center; /* Center-align content */
+    margin-bottom: 20px; /* Spacing below the download section */
 }
 
+/* Download button styles */
 .download-button {
     font-size: 18px;
-    padding: 15px 30px;
-    background-color: #007BFF;
-    color: white;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
+    padding: 15px 30px; /* Button padding */
+    background-color: #007BFF; /* Blue background color */
+    color: white; /* White text color */
+    border: none; /* No border */
+    cursor: pointer; /* Pointer cursor on hover */
+    border-radius: 5px; /* Rounded corners */
 }
 
 .download-button:hover {
-    background-color: #0056b3;
+    background-color: #0056b3; /* Darker blue on hover */
 }
 
 /* Custom styles for the Projects page */
+
+/* Projects container styles */
 .projects-container {
-    text-align: center;
-    padding: 20px;
+    text-align: center; /* Center-align content */
+    padding: 20px; /* Padding around the container */
 }
 
 .projects-container h2 {
-    font-size: 28px;
+    font-size: 28px; /* Larger font size for headings */
 }
 
 .projects-container p {
-    font-size: 16px;
-    margin-bottom: 30px;
+    font-size: 16px; /* Standard font size for paragraphs */
+    margin-bottom: 30px; /* Spacing below paragraphs */
 }
 
 /* Responsive project buttons */
 .project-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-bottom: 20px;
-    gap: 20px; /* Add space between buttons */
+    display: flex; /* Use flex layout */
+    flex-wrap: wrap; /* Allow buttons to wrap onto multiple lines */
+    justify-content: center; /* Center-align buttons horizontally */
+    margin-bottom: 20px; /* Spacing below the button group */
+    gap: 20px; /* Space between buttons */
 }
 
 .project-buttons a {
-    padding: 15px 30px;
-    border-radius: 20px;
-    font-size: 1.2rem; /* Use relative units for scalability */
-    text-decoration: none;
-    color: white;
-    display: inline-block;
-    flex: 1 1 200px; /* Allow buttons to grow and shrink */
-    max-width: 300px;
-    text-align: center;
+    padding: 15px 30px; /* Button padding */
+    border-radius: 20px; /* Rounded corners */
+    font-size: 1.2rem; /* Relative font size for scalability */
+    text-decoration: none; /* Remove underline from links */
+    color: white; /* White text color */
+    display: inline-block; /* Inline-block display for sizing */
+    flex: 1 1 200px; /* Flex properties for responsive sizing */
+    max-width: 300px; /* Maximum width for buttons */
+    text-align: center; /* Center-align text inside buttons */
 }
 
+/* Specific button colors */
 .project-buttons a.green {
-    background-color: #28a745;
+    background-color: #28a745; /* Green background */
 }
 
 .project-buttons a.red {
-    background-color: #dc3545;
+    background-color: #dc3545; /* Red background */
 }
 
 .project-buttons a.yellow {
-    background-color: #ffc107;
+    background-color: #ffc107; /* Yellow background */
 }
 
 .project-buttons a.blue {
-    background-color: #0f07ff;
+    background-color: #0f07ff; /* Blue background */
 }
 
 .project-buttons a:hover {
-    opacity: 0.9;
+    opacity: 0.9; /* Slightly transparent on hover */
 }
 
+/* Project images container */
 .project-images {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px; /* Add space between images */
+    display: flex; /* Use flex layout */
+    flex-wrap: wrap; /* Allow images to wrap onto multiple lines */
+    justify-content: center; /* Center-align images horizontally */
+    gap: 20px; /* Space between images */
 }
 
+/* Individual project image styles */
 .project-images .image {
-    width: 200px;
-    height: 150px;
-    background-color: #ccc;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: 200px; /* Fixed width */
+    height: 150px; /* Fixed height */
+    background-color: #ccc; /* Light gray background */
+    display: flex; /* Use flex to center content */
+    align-items: center; /* Vertical centering */
+    justify-content: center; /* Horizontal centering */
     font-size: 18px;
-    color: black;
-    border: 1px solid #ddd;
-    transition: 0.3s;
+    color: black; /* Text color */
+    border: 1px solid #ddd; /* Border around the image */
+    transition: 0.3s; /* Transition effect for hover */
 }
 
+/* Ensure images fit within their containers */
 .project-images .image img {
-    max-width: 100%;
-    max-height: 100%;
+    max-width: 100%; /* Image will not exceed the container's width */
+    max-height: 100%; /* Image will not exceed the container's height */
 }
 
+/* Hover effect for project images */
 .project-images .image:hover {
-    background-color: #ddd;
+    background-color: #ddd; /* Darker background on hover */
 }
 
 /* Media queries for responsiveness */
+
+/* Medium screens (tablets) */
 @media screen and (min-width: 768px) {
     .project-buttons a {
-        font-size: 1.5rem;
+        font-size: 1.5rem; /* Increase font size */
     }
 
     .project-images .image {
-        width: 250px;
-        height: 200px;
+        width: 250px; /* Increase image width */
+        height: 200px; /* Increase image height */
     }
 }
 
+/* Large screens (desktops) */
 @media screen and (min-width: 1024px) {
     .project-buttons a {
-        font-size: 1.8rem;
+        font-size: 1.8rem; /* Further increase font size */
     }
 
     .project-images .image {
-        width: 300px;
-        height: 250px;
+        width: 300px; /* Further increase image width */
+        height: 250px; /* Further increase image height */
     }
 }
 
-/* Ensure footer doesn't overlap the content */
-/* Already included padding-bottom: 60px; in main */
-
 /* Styles specific to the game page */
+
+/* Remove padding for the game page main element */
 main.game-page {
-    padding: 0; /* Remove padding for the game page */
+    padding: 0;
 }
 
+/* Game container styles */
 #game-container {
-    width: 100%; /* Make the game container fill the available width */
+    width: 100%; /* Full width */
     flex: 1;
-    margin: 0 auto;
-    position: relative; /* For absolute positioning of explosion effect */
-    margin-bottom: 20px; /* Adjusted for new button placement */
+    margin: 0 auto; /* Center the container */
+    position: relative; /* For positioning child elements absolutely */
+    margin-bottom: 20px; /* Space below the game container */
 }
 
+/* Button container styles */
 .button-container {
-    text-align: center;
-    margin-bottom: 20px;
+    text-align: center; /* Center-align buttons */
+    margin-bottom: 20px; /* Space below the buttons */
 }
 
+/* Game buttons styles */
 .button-container button {
-    padding: 10px 20px;
-    margin: 0 10px;
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 18px;
+    padding: 10px 20px; /* Button padding */
+    margin: 0 10px; /* Horizontal spacing between buttons */
+    background-color: #dc3545; /* Red background color */
+    color: white; /* White text color */
+    border: none; /* No border */
+    border-radius: 20px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    font-size: 18px; /* Font size */
 }
 
 .button-container button:hover {
-    background-color: #b32a36;
+    background-color: #b32a36; /* Darker red on hover */
 }
 
 /* Slider styles */
 .slider-container {
-    text-align: center;
-    margin: 20px 0;
+    text-align: center; /* Center-align content */
+    margin: 20px 0; /* Vertical spacing */
 }
 
 .slider-container label {
-    font-size: 18px;
-    margin-right: 10px;
+    font-size: 18px; /* Label font size */
+    margin-right: 10px; /* Space between label and slider */
 }
 
 .slider-container input[type="range"] {
-    width: 300px;
+    width: 300px; /* Slider width */
 }
 
-/* Particle effect */
+/* Particle effect styles */
 .particle {
     position: absolute;
-    width: 5px;
+    width: 5px; /* Particle size */
     height: 5px;
-    background-color: #FF4500;
-    border-radius: 50%;
-    pointer-events: none;
-    animation: particle-animation 1s forwards;
+    background-color: #FF4500; /* Orange color */
+    border-radius: 50%; /* Make particles circular */
+    pointer-events: none; /* Allow clicks to pass through particles */
+    animation: particle-animation 1s forwards; /* Animation effect */
 }
 
+/* Keyframes for particle animation */
 @keyframes particle-animation {
     to {
         transform: translate(var(--move-x), var(--move-y)) rotate(var(--rotation)) scale(var(--scale));
-        opacity: 0;
+        opacity: 0; /* Fade out */
     }
 }
 
-/* Ensure the canvas fills the container */
+/* Ensure the canvas fills the game container */
 #game-canvas {
     display: block;
     width: 100%;
@@ -284,137 +311,162 @@ main.game-page {
 }
 
 /* Styles for the test page */
+
+/* Container for the test */
 .test-container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    text-align: center;
+    max-width: 800px; /* Maximum width */
+    margin: 0 auto; /* Center the container */
+    padding: 20px; /* Padding around the content */
+    text-align: center; /* Center-align content */
 }
 
+/* Question heading styles */
 .question h3 {
-    font-size: 1.2em;
-    margin-bottom: 10px;
+    font-size: 1.2em; /* Font size */
+    margin-bottom: 10px; /* Space below the question */
 }
 
+/* Options list styles */
 .options {
-    list-style-type: none;
-    padding: 0;
-    text-align: left; /* Keep options aligned left for readability */
-    display: inline-block;
+    list-style-type: none; /* Remove bullet points */
+    padding: 0; /* Remove default padding */
+    text-align: left; /* Align options to the left for readability */
+    display: inline-block; /* Inline-block to shrink-wrap content */
 }
 
+/* Individual option styles */
 .options li {
-    margin-bottom: 10px;
+    margin-bottom: 10px; /* Space below each option */
 }
 
+/* Input styles for radio and checkbox options */
 .options input[type="radio"],
 .options input[type="checkbox"] {
-    margin-right: 10px;
+    margin-right: 10px; /* Space between input and label */
 }
 
+/* Navigation buttons container */
 .navigation-buttons {
-    text-align: center;
-    margin-top: 20px;
+    text-align: center; /* Center-align buttons */
+    margin-top: 20px; /* Space above the buttons */
 }
 
+/* Navigation button styles */
 .navigation-buttons button {
-    padding: 10px 20px;
-    margin: 0 5px;
-    background-color: #007BFF;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+    padding: 10px 20px; /* Button padding */
+    margin: 0 5px; /* Horizontal spacing between buttons */
+    background-color: #007BFF; /* Blue background color */
+    color: white; /* White text color */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
 }
 
+/* Disabled button styles */
 .navigation-buttons button:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
+    background-color: #cccccc; /* Gray background for disabled buttons */
+    cursor: not-allowed; /* Not-allowed cursor */
 }
 
+/* Hover effect for enabled buttons */
 .navigation-buttons button:hover:not(:disabled) {
-    background-color: #0056b3;
+    background-color: #0056b3; /* Darker blue on hover */
 }
 
+/* Result breakdown styles */
 .breakdown {
-    margin-top: 20px;
+    margin-top: 20px; /* Space above the breakdown */
 }
 
+/* Explanation styles */
 .explanations {
-    margin-top: 20px;
-    text-align: left;
+    margin-top: 20px; /* Space above explanations */
+    text-align: left; /* Left-align text */
 }
 
+/* Individual explanation styles */
 .explanation {
-    padding: 10px;
-    margin-bottom: 10px;
+    padding: 10px; /* Padding around the explanation */
+    margin-bottom: 10px; /* Space below each explanation */
 }
 
 .explanation h3 {
-    margin-bottom: 5px;
+    margin-bottom: 5px; /* Space below the heading */
 }
 
 .explanation p {
-    margin: 5px 0;
+    margin: 5px 0; /* Vertical spacing for paragraphs */
 }
 
 /* Styles specific to the finance tools */
+
+/* Finance tools container styles */
 #finance-tools section {
-    max-width: 600px;
-    margin: 0 auto 40px auto;
-    text-align: center;
+    max-width: 600px; /* Maximum width for readability */
+    margin: 0 auto 40px auto; /* Center-align and space below each section */
+    text-align: center; /* Center-align section content */
 }
 
+/* Finance tools form styles */
 #finance-tools form {
-    display: inline-block;
-    text-align: left;
+    display: inline-block; /* Shrink-wrap form content */
+    text-align: left; /* Left-align form elements */
 }
 
+/* Spacing between form elements */
 #finance-tools form div {
-    margin-bottom: 10px;
+    margin-bottom: 10px; /* Space below each form group */
 }
 
+/* Label styles within finance tools */
 #finance-tools label {
-    display: inline-block;
-    width: 150px;
+    display: inline-block; /* Align labels and inputs horizontally */
+    width: 150px; /* Fixed width for labels to align inputs */
 }
 
+/* Input and select styles within finance tools */
 #finance-tools input[type="number"],
 #finance-tools input[type="text"],
 #finance-tools select {
-    width: 200px;
+    width: 200px; /* Consistent input width */
 }
 
+/* Button styles within finance tools */
 #finance-tools button {
-    padding: 10px 20px;
-    margin-top: 10px;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    cursor: pointer;
+    padding: 10px 20px; /* Button padding */
+    margin-top: 10px; /* Space above buttons */
+    background-color: #28a745; /* Green background color */
+    color: white; /* White text color */
+    border: none; /* No border */
+    cursor: pointer; /* Pointer cursor on hover */
 }
 
+/* Hover effect for finance tools buttons */
 #finance-tools button:hover {
-    background-color: #218838;
+    background-color: #218838; /* Darker green on hover */
 }
 
 /* Styles for the expense list within the finance tools */
+
+/* Expense list container */
 #finance-tools #expense-list {
-    margin-top: 10px;
+    margin-top: 10px; /* Space above the expense list */
 }
 
+/* Individual expense item styles */
 #finance-tools #expense-list div {
-    margin-bottom: 5px;
+    margin-bottom: 5px; /* Space below each expense item */
 }
 
+/* Input styles for expense items */
 #finance-tools #expense-list input[type="text"],
 #finance-tools #expense-list input[type="number"] {
-    width: 180px;
+    width: 180px; /* Input width */
 }
 
 /* Error message styles within the finance tools */
 #finance-tools .error-message {
-    color: red;
-    font-weight: bold;
-    margin-top: 10px;
+    color: red; /* Red text color for errors */
+    font-weight: bold; /* Bold text */
+    margin-top: 10px; /* Space above the error message */
 }
