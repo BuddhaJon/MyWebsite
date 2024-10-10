@@ -3,9 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <title>Stress Relief Simulator</title>
-    <link rel="stylesheet" href="style.css"> <!-- Use the external stylesheet -->
+    <link rel="stylesheet" href="style.css"> <!-- Use the external stylesheet for global styles -->
     <link rel="icon" href="pictures/favicon.png" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Game-specific CSS -->
+    <style>
+        /* Styles specific to the game page */
+
+        /* Adjust padding for the game page main element */
+        main.game-page {
+            padding: 20px 10%; /* Added padding to top and sides */
+            flex: 1;
+        }
+
+        /* Game container styles */
+        #game-container {
+            width: 100%; /* Full width */
+            flex: 1;
+            margin: 0 auto; /* Center the container */
+            position: relative; /* For positioning child elements absolutely */
+            margin-bottom: 20px; /* Space below the game container */
+            box-sizing: border-box; /* Include padding and border in height calculation */
+        }
+
+        /* Ensure the game container fills the available space */
+        #game-container {
+            height: calc(100vh - 250px); /* Adjust the height to fill the viewport minus header/footer */
+        }
+
+        /* Button container styles */
+        .button-container {
+            text-align: center; /* Center-align buttons */
+            margin-bottom: 20px; /* Space below the buttons */
+            padding-top: 10px; /* Add padding to top */
+        }
+
+        /* Game buttons styles */
+        .button-container button {
+            padding: 10px 20px; /* Button padding */
+            margin: 0 10px; /* Horizontal spacing between buttons */
+            background-color: #dc3545; /* Red background color */
+            color: white; /* White text color */
+            border: none; /* No border */
+            border-radius: 20px; /* Rounded corners */
+            cursor: pointer; /* Pointer cursor on hover */
+            font-size: 18px; /* Font size */
+        }
+
+        .button-container button:hover {
+            background-color: #b32a36; /* Darker red on hover */
+        }
+
+        /* Slider styles */
+        .slider-container {
+            text-align: center; /* Center-align content */
+            margin: 20px 0; /* Vertical spacing */
+        }
+
+        .slider-container label {
+            font-size: 18px; /* Label font size */
+            margin-right: 10px; /* Space between label and slider */
+        }
+
+        .slider-container input[type="range"] {
+            width: 300px; /* Slider width */
+        }
+
+        /* Particle effect styles */
+        .particle {
+            position: absolute;
+            width: 5px; /* Particle size */
+            height: 5px;
+            background-color: #FF4500; /* Orange color */
+            border-radius: 50%; /* Make particles circular */
+            pointer-events: none; /* Allow clicks to pass through particles */
+            animation: particle-animation 1s forwards; /* Animation effect */
+        }
+
+        /* Keyframes for particle animation */
+        @keyframes particle-animation {
+            to {
+                transform: translate(var(--move-x), var(--move-y)) rotate(var(--rotation)) scale(var(--scale));
+                opacity: 0; /* Fade out */
+            }
+        }
+
+        /* Ensure the canvas fills the game container */
+        #game-canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
 </head>
 <body>
     <!-- Consistent header as in other pages -->
@@ -30,6 +119,17 @@
             <input type="range" id="explosion-power" min="50" max="500" value="200">
         </div>
 
+        <!-- Block count controls -->
+        <div class="slider-container">
+            <label for="block-columns">Number of Columns (Width):</label>
+            <input type="range" id="block-columns" min="5" max="20" value="10">
+        </div>
+
+        <div class="slider-container">
+            <label for="block-rows">Number of Rows (Height):</label>
+            <input type="range" id="block-rows" min="5" max="20" value="10">
+        </div>
+
         <!-- Game area placeholder -->
         <div id="game-container">
             <!-- Canvas will be dynamically sized -->
@@ -47,11 +147,16 @@
         <p>Developed by Jonathan Rothe</p>
     </footer>
 
+    <!-- Matter.js Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.17.1/matter.min.js"></script>
+
+    <!-- Game Script -->
     <script>
         const playButton = document.getElementById('play-button');
         const resetButton = document.getElementById('reset-button');
         const explosionPowerSlider = document.getElementById('explosion-power');
+        const blockColumnsSlider = document.getElementById('block-columns');
+        const blockRowsSlider = document.getElementById('block-rows');
         let isPlaying = false;
 
         // Setup for Matter.js Game
@@ -89,28 +194,40 @@
             // Adjust canvas size
             resizeCanvas();
 
-            // Ground
+            // Ground (invisible but necessary to prevent blocks from falling off-screen)
             const canvasWidth = render.canvas.width;
             const canvasHeight = render.canvas.height;
-            ground = Bodies.rectangle(canvasWidth / 2, canvasHeight - 10, canvasWidth + 20, 20, { isStatic: true });
+            ground = Bodies.rectangle(canvasWidth / 2, canvasHeight + 50, canvasWidth, 100, { isStatic: true, render: { visible: false } });
 
-            // Create a wall of blocks
-            const blockSize = 40;
-            const columns = 10;
-            const rows = 10;
-            const totalBlockWidth = columns * blockSize;
-            const totalBlockHeight = rows * blockSize;
+            // Get the number of blocks from the sliders
+            const columns = parseInt(blockColumnsSlider.value);
+            const rows = parseInt(blockRowsSlider.value);
+
+            // Adjust block size based on number of blocks and canvas size
+            const blockWidth = canvasWidth / columns;
+            const blockHeight = canvasHeight / rows;
+
+            // Limit block size to reasonable values
+            const maxBlockSize = 40; // Maximum block size
+            const adjustedBlockWidth = Math.min(blockWidth, maxBlockSize);
+            const adjustedBlockHeight = Math.min(blockHeight, maxBlockSize);
+
+            const totalBlockWidth = columns * adjustedBlockWidth;
+            const totalBlockHeight = rows * adjustedBlockHeight;
             const startX = (canvasWidth - totalBlockWidth) / 2;
-            const startY = canvasHeight - totalBlockHeight - 20; // Position blocks above the ground
+            const startY = canvasHeight - totalBlockHeight; // Position blocks at the bottom
 
             wall = Composites.stack(startX, startY, columns, rows, 0, 0, function(x, y) {
                 const color = getRandomColor();
-                const block = Bodies.rectangle(x, y, blockSize, blockSize, {
+                const block = Bodies.rectangle(x, y, adjustedBlockWidth, adjustedBlockHeight, {
+                    restitution: 0.1, // Reduce bounciness
+                    friction: 0.9, // Increase friction
+                    density: 0.005, // Increase density to make blocks heavier
                     render: {
                         fillStyle: color
                     }
                 });
-                block.initialSize = blockSize; // Store the initial size
+                block.initialSize = Math.min(adjustedBlockWidth, adjustedBlockHeight); // Store the initial size
                 block.blockColor = color; // Store the block's color for fragments
                 return block;
             });
@@ -241,7 +358,6 @@
 
             // Remove the block if it's too small to fragment further
             if (fragmentWidth < minBlockSize || fragmentHeight < minBlockSize) {
-                // Instead of returning, we remove the body completely
                 return;
             }
 
@@ -255,8 +371,9 @@
                     fragmentWidth,
                     fragmentHeight,
                     {
-                        restitution: body.restitution,
-                        friction: body.friction,
+                        restitution: 0.1,
+                        friction: 0.9,
+                        density: body.density, // Keep the same density as parent
                         render: {
                             fillStyle: body.blockColor // Use the parent block's color
                         }
@@ -323,7 +440,7 @@
         function resizeCanvas() {
             const gameContainer = document.getElementById('game-container');
             const width = gameContainer.clientWidth;
-            const height = window.innerHeight - gameContainer.getBoundingClientRect().top - 150; // Adjust as needed
+            const height = gameContainer.clientHeight;
 
             render.canvas.width = width;
             render.canvas.height = height;
@@ -342,6 +459,15 @@
         });
 
         resetButton.addEventListener('click', function() {
+            resetGame();
+        });
+
+        // Re-initialize the game when the block count changes
+        blockColumnsSlider.addEventListener('input', function() {
+            resetGame();
+        });
+
+        blockRowsSlider.addEventListener('input', function() {
             resetGame();
         });
 
