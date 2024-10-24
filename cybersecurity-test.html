@@ -6,6 +6,90 @@
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="pictures/favicon.png" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Additional CSS for new features -->
+    <style>
+        /* Style for the question counter */
+        .question-counter {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        /* Style for the flag button */
+        .flag-button {
+            background-color: #ffc107;
+            color: #212529;
+            border: none;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .flag-button.active {
+            background-color: #fd7e14;
+            color: #fff;
+        }
+
+        /* Style for the review page */
+        .review-page {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center; /* Center the review question boxes */
+        }
+
+        .review-question {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #6c757d;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 4px;
+            position: relative;
+            font-size: 18px;
+        }
+
+        .review-question.answered {
+            background-color: #28a745;
+        }
+
+        /* Change background color for flagged questions */
+        .review-question.flagged {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .review-question:hover {
+            opacity: 0.8;
+        }
+
+        .navigation-buttons {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column; /* Stack buttons vertically */
+            align-items: center;    /* Center the buttons horizontally */
+        }
+
+        .top-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .bottom-buttons {
+            margin-top: 10px;
+        }
+
+        .navigation-buttons button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        /* Other styles remain the same... */
+    </style>
 </head>
 <body>
     <!-- Consistent header -->
@@ -28,9 +112,15 @@
                 <!-- Question will be injected here -->
             </div>
             <div class="navigation-buttons">
-                <button id="prev-button" disabled>Previous</button>
-                <button id="next-button">Next</button>
-                <button id="submit-button" style="display: none;">Submit</button>
+                <!-- Modified HTML structure -->
+                <div class="top-buttons">
+                    <button id="prev-button" disabled>Previous</button>
+                    <button id="next-button">Next</button>
+                    <button id="submit-button" style="display: none;">Submit</button>
+                </div>
+                <div class="bottom-buttons">
+                    <button id="review-button">Review</button>
+                </div>
             </div>
         </section>
     </main>
@@ -41,7 +131,9 @@
 
     <!-- JavaScript code -->
     <script>
-        const questions = [];
+        let questions = [];
+        let userAnswers = [];
+        let flaggedQuestions = [];
 
         // Initialize questions according to domain percentages
         const domains = [
@@ -52,8 +144,7 @@
             { name: "Security Program Management and Oversight", percentage: 20, questions: [] },
         ];
 
-// Domain 1: General Security Concepts (12 questions)
-const allQuestions = [
+        const allQuestions = [
     {
         domain: "General Security Concepts",
         question: "Which of the following is a technical control?",
@@ -1413,13 +1504,11 @@ const allQuestions = [
     explanation: "Insider threat awareness programs help employees recognize signs of insider threats and know how to report them.",
     type: "single"
 }
-
-
-];
-            // Questions will be added here
+]
 
         // Distribute questions into domains
         function distributeQuestions() {
+            questions = []; // Reset questions array
             // Calculate the number of questions per domain
             domains.forEach(domain => {
                 domain.numQuestions = Math.round(domain.percentage);
@@ -1439,73 +1528,101 @@ const allQuestions = [
         distributeQuestions();
 
         let currentQuestionIndex = 0;
-        const userAnswers = [];
 
         function showQuestion(index) {
-    const container = document.getElementById('question-container');
-    container.innerHTML = '';
+            const container = document.getElementById('question-container');
+            container.innerHTML = '';
 
-    if (index < questions.length) {
-        const q = questions[index];
-        const questionElem = document.createElement('div');
-        questionElem.className = 'question';
+            // Ensure navigation buttons are visible
+            document.querySelector('.navigation-buttons').style.display = 'flex';
 
-        const questionText = document.createElement('h3');
-        questionText.textContent = `Question ${index + 1}: ${q.question}`;
-        questionElem.appendChild(questionText);
+            if (index < questions.length) {
+                const q = questions[index];
+                const questionElem = document.createElement('div');
+                questionElem.className = 'question';
 
-        const optionsList = document.createElement('ul');
-        optionsList.className = 'options';
+                // Question counter
+                const counterElem = document.createElement('div');
+                counterElem.className = 'question-counter';
+                counterElem.textContent = `Question ${index + 1} of ${questions.length}`;
+                questionElem.appendChild(counterElem);
 
-        q.options.forEach((option, i) => {
-            const optionItem = document.createElement('li');
+                // Flag button
+                const flagButton = document.createElement('button');
+                flagButton.className = 'flag-button';
+                flagButton.textContent = flaggedQuestions.includes(index) ? 'Unflag' : 'Flag for Review';
+                if (flaggedQuestions.includes(index)) {
+                    flagButton.classList.add('active');
+                }
+                flagButton.addEventListener('click', () => {
+                    if (flaggedQuestions.includes(index)) {
+                        flaggedQuestions.splice(flaggedQuestions.indexOf(index), 1);
+                        flagButton.textContent = 'Flag for Review';
+                        flagButton.classList.remove('active');
+                    } else {
+                        flaggedQuestions.push(index);
+                        flagButton.textContent = 'Unflag';
+                        flagButton.classList.add('active');
+                    }
+                });
+                questionElem.appendChild(flagButton);
 
-            const input = document.createElement('input');
-            input.type = q.type === 'multiple' ? 'checkbox' : 'radio';
-            input.name = q.type === 'multiple' ? `option${index}_${i}` : 'option';
-            input.value = i;
-            input.id = `option${index}_${i}`;
+                const questionText = document.createElement('h3');
+                questionText.textContent = q.question;
+                questionElem.appendChild(questionText);
 
-            // Preserve user's previous selection
-            if (userAnswers[index] && userAnswers[index].includes(i)) {
-                input.checked = true;
+                const optionsList = document.createElement('ul');
+                optionsList.className = 'options';
+
+                q.options.forEach((option, i) => {
+                    const optionItem = document.createElement('li');
+
+                    const input = document.createElement('input');
+                    input.type = q.type === 'multiple' ? 'checkbox' : 'radio';
+                    input.name = q.type === 'multiple' ? `option${index}_${i}` : 'option';
+                    input.value = i;
+                    input.id = `option${index}_${i}`;
+
+                    // Preserve user's previous selection
+                    if (userAnswers[index] && userAnswers[index].includes(i)) {
+                        input.checked = true;
+                    }
+
+                    const label = document.createElement('label');
+                    label.htmlFor = `option${index}_${i}`;
+                    label.textContent = option;
+
+                    optionItem.appendChild(input);
+                    optionItem.appendChild(label);
+                    optionsList.appendChild(optionItem);
+                });
+
+                questionElem.appendChild(optionsList);
+                container.appendChild(questionElem);
+
+                // Update navigation buttons
+                document.getElementById('prev-button').disabled = index === 0;
+                document.getElementById('next-button').style.display = index === questions.length - 1 ? 'none' : 'inline-block';
+                document.getElementById('submit-button').style.display = index === questions.length - 1 ? 'inline-block' : 'none';
+            }
+        }
+
+
+        function saveAnswer() {
+            const q = questions[currentQuestionIndex];
+            let selectedOptions = [];
+
+            if (q.type === 'multiple') {
+                selectedOptions = Array.from(document.querySelectorAll(`input[id^="option${currentQuestionIndex}_"]:checked`)).map(input => parseInt(input.value));
+            } else {
+                const selectedOption = document.querySelector('input[name="option"]:checked');
+                if (selectedOption) {
+                    selectedOptions = [parseInt(selectedOption.value)];
+                }
             }
 
-            const label = document.createElement('label');
-            label.htmlFor = `option${index}_${i}`;
-            label.textContent = option;
-
-            optionItem.appendChild(input);
-            optionItem.appendChild(label);
-            optionsList.appendChild(optionItem);
-        });
-
-        questionElem.appendChild(optionsList);
-        container.appendChild(questionElem);
-
-        // Update navigation buttons
-        document.getElementById('prev-button').disabled = index === 0;
-        document.getElementById('next-button').style.display = index === questions.length - 1 ? 'none' : 'inline-block';
-        document.getElementById('submit-button').style.display = index === questions.length - 1 ? 'inline-block' : 'none';
-    }
-}
-
-
-function saveAnswer() {
-    const q = questions[currentQuestionIndex];
-    let selectedOptions = [];
-
-    if (q.type === 'multiple') {
-        selectedOptions = Array.from(document.querySelectorAll(`input[id^="option${currentQuestionIndex}_"]:checked`)).map(input => parseInt(input.value));
-    } else {
-        const selectedOption = document.querySelector('input[name="option"]:checked');
-        if (selectedOption) {
-            selectedOptions = [parseInt(selectedOption.value)];
+            userAnswers[currentQuestionIndex] = selectedOptions;
         }
-    }
-
-    userAnswers[currentQuestionIndex] = selectedOptions;
-}
 
 
         document.getElementById('next-button').addEventListener('click', () => {
@@ -1522,39 +1639,99 @@ function saveAnswer() {
 
         document.getElementById('submit-button').addEventListener('click', () => {
             saveAnswer();
-            showResults();
+            showReviewPage();
         });
 
-        function showResults() {
-    let score = 0;
-    const domainScores = {};
+        // Review button to access the review page from any question
+        document.getElementById('review-button').addEventListener('click', () => {
+            saveAnswer();
+            showReviewPage();
+        });
 
-    // Initialize domain scores
-    domains.forEach(domain => {
-        domainScores[domain.name] = { correct: 0, total: domain.questions.length };
-    });
+        function showReviewPage() {
+            const container = document.getElementById('question-container');
+            container.innerHTML = '<h2>Review Questions</h2>';
 
-    questions.forEach((q, index) => {
-        const userAns = userAnswers[index] || [];
-        const correctAns = q.correctAnswer;
+            const reviewContainer = document.createElement('div');
+            reviewContainer.className = 'review-page';
 
-        // Check if the question is multiple-selection
-        if (q.type === 'multiple') {
-            // All-or-nothing scoring for multiple-selection questions
-            const isCorrect = userAns.length === correctAns.length && userAns.every(val => correctAns.includes(val));
-            if (isCorrect) {
-                score++;
-                domainScores[q.domain].correct++;
-            }
-        } else {
-            // Single-selection question
-            const isCorrect = userAns[0] === correctAns[0];
-            if (isCorrect) {
-                score++;
-                domainScores[q.domain].correct++;
-            }
+            questions.forEach((q, index) => {
+                const questionButton = document.createElement('a');
+                questionButton.href = '#';
+                questionButton.className = 'review-question';
+                questionButton.textContent = index + 1;
+
+                // Indicate if the question is answered
+                if (userAnswers[index] && userAnswers[index].length > 0) {
+                    questionButton.classList.add('answered');
+                }
+
+                // Indicate if the question is flagged
+                if (flaggedQuestions.includes(index)) {
+                    questionButton.classList.add('flagged');
+                }
+
+                questionButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    currentQuestionIndex = index;
+                    showQuestion(currentQuestionIndex);
+                });
+
+                reviewContainer.appendChild(questionButton);
+            });
+
+            container.appendChild(reviewContainer);
+
+            // Submit button
+            const finalSubmitButton = document.createElement('button');
+            finalSubmitButton.textContent = 'Submit Test';
+            finalSubmitButton.addEventListener('click', () => {
+                showResults();
+            });
+
+            // Center the submit button
+            finalSubmitButton.style.display = 'block';
+            finalSubmitButton.style.margin = '20px auto';
+            finalSubmitButton.style.padding = '10px 20px';
+            finalSubmitButton.style.fontSize = '16px';
+            finalSubmitButton.style.cursor = 'pointer';
+
+            container.appendChild(finalSubmitButton);
+
+            // Hide navigation buttons on the review page
+            document.querySelector('.navigation-buttons').style.display = 'none';
         }
-    });
+
+        function showResults() {
+            let score = 0;
+            const domainScores = {};
+
+            // Initialize domain scores
+            domains.forEach(domain => {
+                domainScores[domain.name] = { correct: 0, total: domain.questions.length };
+            });
+
+            questions.forEach((q, index) => {
+                const userAns = userAnswers[index] || [];
+                const correctAns = q.correctAnswer;
+
+                // Check if the question is multiple-selection
+                if (q.type === 'multiple') {
+                    // All-or-nothing scoring for multiple-selection questions
+                    const isCorrect = userAns.length === correctAns.length && userAns.every(val => correctAns.includes(val));
+                    if (isCorrect) {
+                        score++;
+                        domainScores[q.domain].correct++;
+                    }
+                } else {
+                    // Single-selection question
+                    const isCorrect = userAns[0] === correctAns[0];
+                    if (isCorrect) {
+                        score++;
+                        domainScores[q.domain].correct++;
+                    }
+                }
+            });
 
             // Display the results
             const container = document.getElementById('question-container');
@@ -1578,6 +1755,15 @@ function saveAnswer() {
             });
 
             container.appendChild(breakdownElem);
+
+            // Retake Test Button
+            const retakeButton = document.createElement('button');
+            retakeButton.textContent = 'Retake Test';
+            retakeButton.className = 'retake-button';
+            retakeButton.addEventListener('click', () => {
+                resetTest();
+            });
+            container.appendChild(retakeButton);
 
             // Explanations
             const explanationsElem = document.createElement('div');
@@ -1615,6 +1801,23 @@ function saveAnswer() {
 
             // Hide navigation buttons
             document.querySelector('.navigation-buttons').style.display = 'none';
+        }
+
+        // Function to reset the test
+        function resetTest() {
+            // Reset variables
+            userAnswers = [];
+            flaggedQuestions = [];
+            currentQuestionIndex = 0;
+
+            // Optionally, reshuffle questions or redistribute if desired
+            distributeQuestions();
+
+            // Show the first question
+            showQuestion(currentQuestionIndex);
+
+            // Show navigation buttons
+            document.querySelector('.navigation-buttons').style.display = 'flex';
         }
 
         // Start the test
