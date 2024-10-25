@@ -88,6 +88,22 @@
             cursor: pointer;
         }
 
+        /* Common button styles */
+.btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #007bff; /* Adjust the color as needed */
+    color: #fff; /* White text */
+    border: none;
+    border-radius: 4px;
+}
+
+.btn:hover {
+    background-color: #0056b3; /* Darker shade on hover */
+}
+
+
         /* Other styles remain the same... */
     </style>
 </head>
@@ -112,16 +128,16 @@
                 <!-- Question will be injected here -->
             </div>
             <div class="navigation-buttons">
-                <!-- Modified HTML structure -->
                 <div class="top-buttons">
-                    <button id="prev-button" disabled>Previous</button>
-                    <button id="next-button">Next</button>
-                    <button id="submit-button" style="display: none;">Submit</button>
+                    <button id="prev-button" class="btn" disabled>Previous</button>
+                    <button id="next-button" class="btn">Next</button>
+                    <button id="submit-button" class="btn">Submit</button>
                 </div>
                 <div class="bottom-buttons">
-                    <button id="review-button">Review</button>
+                    <button id="review-button" class="btn">Review</button>
                 </div>
             </div>
+            
         </section>
     </main>
 
@@ -1683,18 +1699,16 @@
             container.appendChild(reviewContainer);
 
             // Submit button
-            const finalSubmitButton = document.createElement('button');
-            finalSubmitButton.textContent = 'Submit Test';
-            finalSubmitButton.addEventListener('click', () => {
-                showResults();
-            });
+    const finalSubmitButton = document.createElement('button');
+    finalSubmitButton.textContent = 'Submit Test';
+    finalSubmitButton.className = 'btn'; // Assign the 'btn' class
+    finalSubmitButton.addEventListener('click', () => {
+        showResults();
+    });
 
-            // Center the submit button
-            finalSubmitButton.style.display = 'block';
-            finalSubmitButton.style.margin = '20px auto';
-            finalSubmitButton.style.padding = '10px 20px';
-            finalSubmitButton.style.fontSize = '16px';
-            finalSubmitButton.style.cursor = 'pointer';
+    // Center the submit button
+    finalSubmitButton.style.display = 'block';
+    finalSubmitButton.style.margin = '20px auto';
 
             container.appendChild(finalSubmitButton);
 
@@ -1759,7 +1773,7 @@
             // Retake Test Button
             const retakeButton = document.createElement('button');
             retakeButton.textContent = 'Retake Test';
-            retakeButton.className = 'retake-button';
+            retakeButton.className = 'btn';
             retakeButton.addEventListener('click', () => {
                 resetTest();
             });

@@ -5,64 +5,10 @@
     <title>Ragdoll Physics Game</title>
     <link rel="icon" href="pictures/favicon.png" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Embedded CSS -->
+    <!-- Link to Global Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Embedded CSS for Game-Specific Styles -->
     <style>
-        /* Global styles */
-        html, body {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            background-color: #f4f4f4;
-        }
-
-        header {
-            background-color: #333;
-            color: #fff;
-            padding: 1rem 0;
-            text-align: center;
-        }
-
-        header h1 {
-            margin: 0;
-        }
-
-        nav ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        nav ul li {
-            display: inline-block;
-            margin: 0 10px;
-        }
-
-        nav ul li a {
-            color: #fff;
-            text-decoration: none;
-        }
-
-        main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-        }
-
-        footer {
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            padding: 10px 0;
-            width: 100%;
-        }
-
         /* Styles specific to the game page */
         main.game-page {
             padding: 0;
@@ -147,6 +93,7 @@
 
     <!-- Matter.js library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.17.1/matter.min.js"></script>
+    <!-- Main JavaScript Code -->
     <script>
         // Module aliases
         const {
@@ -160,8 +107,7 @@
             Composite,
             Mouse,
             MouseConstraint,
-            Events,
-            Common
+            Events
         } = Matter;
 
         // Create engine and world
@@ -193,180 +139,130 @@
         const runner = Runner.create();
         Runner.run(runner, engine);
 
-        // Variable to store the support constraint
-        let supportConstraint;
+        // Function to create a ragdoll with realistic joint constraints
+        function createRagdoll(x, y, scale) {
+            scale = typeof scale === 'undefined' ? 1 : scale;
 
-        // Variable to store the ragdoll
-        let ragdoll;
+            // Body options
+            const headOptions = {
+                density: 0.001 * scale * scale,
+                frictionAir: 0.05,
+                restitution: 0.3,
+                collisionFilter: { group: Body.nextGroup(true) },
+                render: { fillStyle: '#FFB6C1' }
+            };
 
-        // Function to normalize angles to the range [-PI, PI]
-        function normalizeAngle(angle) {
-            return Math.atan2(Math.sin(angle), Math.cos(angle));
-        }
+            const bodyOptions = {
+                density: 0.001 * scale * scale,
+                frictionAir: 0.05,
+                restitution: 0.3,
+                collisionFilter: { group: Body.nextGroup(true) },
+                render: { fillStyle: '#87CEFA' }
+            };
 
-        // Function to create a ragdoll with limited joint movement
-        function createRagdoll(x, y) {
-            const group = Body.nextGroup(true);
+            const limbOptions = {
+                density: 0.001 * scale * scale,
+                frictionAir: 0.05,
+                restitution: 0.3,
+                collisionFilter: { group: Body.nextGroup(true) },
+                render: { fillStyle: '#FFD700' }
+            };
 
             // Create body parts
-            const head = Bodies.circle(x, y - 100, 20, {
-                collisionFilter: { group: group },
-                density: 0.005,
-                friction: 0.9,
-                render: { fillStyle: '#FFB6C1' }
-            });
+            const head = Bodies.circle(x, y - 70 * scale, 20 * scale, headOptions);
+            const chest = Bodies.rectangle(x, y, 40 * scale, 60 * scale, bodyOptions);
 
-            const chest = Bodies.rectangle(x, y - 50, 40, 60, {
-                collisionFilter: { group: group },
-                density: 0.005,
-                friction: 0.9,
-                render: { fillStyle: '#87CEFA' }
-            });
+            const leftUpperArm = Bodies.rectangle(x - 35 * scale, y - 20 * scale, 20 * scale, 40 * scale, limbOptions);
+            const leftLowerArm = Bodies.rectangle(x - 35 * scale, y + 10 * scale, 20 * scale, 40 * scale, limbOptions);
 
-            const leftUpperArm = Bodies.rectangle(x - 35, y - 50, 20, 40, {
-                collisionFilter: { group: group },
-                density: 0.005,
-                friction: 0.9,
-                render: { fillStyle: '#FFD700' }
-            });
+            const rightUpperArm = Bodies.rectangle(x + 35 * scale, y - 20 * scale, 20 * scale, 40 * scale, limbOptions);
+            const rightLowerArm = Bodies.rectangle(x + 35 * scale, y + 10 * scale, 20 * scale, 40 * scale, limbOptions);
 
-            const leftLowerArm = Bodies.rectangle(x - 35, y - 20, 20, 40, {
-                collisionFilter: { group: group },
-                density: 0.005,
-                friction: 0.9,
-                render: { fillStyle: '#FFD700' }
-            });
+            const leftUpperLeg = Bodies.rectangle(x - 15 * scale, y + 50 * scale, 20 * scale, 40 * scale, limbOptions);
+            const leftLowerLeg = Bodies.rectangle(x - 15 * scale, y + 80 * scale, 20 * scale, 40 * scale, limbOptions);
 
-            const rightUpperArm = Bodies.rectangle(x + 35, y - 50, 20, 40, {
-                collisionFilter: { group: group },
-                density: 0.005,
-                friction: 0.9,
-                render: { fillStyle: '#FFD700' }
-            });
-
-            const rightLowerArm = Bodies.rectangle(x + 35, y - 20, 20, 40, {
-                collisionFilter: { group: group },
-                density: 0.005,
-                friction: 0.9,
-                render: { fillStyle: '#FFD700' }
-            });
-
-            const leftUpperLeg = Bodies.rectangle(x - 15, y + 10, 20, 50, {
-                collisionFilter: { group: group },
-                density: 0.005,
-                friction: 1.0,
-                render: { fillStyle: '#8A2BE2' }
-            });
-
-            const leftLowerLeg = Bodies.rectangle(x - 15, y + 60, 20, 50, {
-                collisionFilter: { group: group },
-                density: 0.005,
-                friction: 1.0,
-                render: { fillStyle: '#8A2BE2' }
-            });
-
-            const rightUpperLeg = Bodies.rectangle(x + 15, y + 10, 20, 50, {
-                collisionFilter: { group: group },
-                density: 0.005,
-                friction: 1.0,
-                render: { fillStyle: '#8A2BE2' }
-            });
-
-            const rightLowerLeg = Bodies.rectangle(x + 15, y + 60, 20, 50, {
-                collisionFilter: { group: group },
-                density: 0.005,
-                friction: 1.0,
-                render: { fillStyle: '#8A2BE2' }
-            });
+            const rightUpperLeg = Bodies.rectangle(x + 15 * scale, y + 50 * scale, 20 * scale, 40 * scale, limbOptions);
+            const rightLowerLeg = Bodies.rectangle(x + 15 * scale, y + 80 * scale, 20 * scale, 40 * scale, limbOptions);
 
             // Create constraints (joints)
-            const headToChest = Constraint.create({
+            const neck = Constraint.create({
                 bodyA: head,
-                pointA: { x: 0, y: 25 },
+                pointA: { x: 0, y: 20 * scale },
                 bodyB: chest,
-                pointB: { x: 0, y: -30 },
-                stiffness: 1,
-                length: 0,
+                pointB: { x: 0, y: -30 * scale },
+                stiffness: 0.9,
                 render: { visible: false }
             });
 
-            const chestToLeftUpperArm = Constraint.create({
+            const leftShoulder = Constraint.create({
                 bodyA: chest,
-                pointA: { x: -20, y: -20 },
+                pointA: { x: -20 * scale, y: -20 * scale },
                 bodyB: leftUpperArm,
-                pointB: { x: 0, y: -20 },
-                stiffness: 1,
-                length: 0,
+                pointB: { x: 0, y: -20 * scale },
+                stiffness: 0.9,
                 render: { visible: false }
             });
 
-            const leftUpperToLowerArm = Constraint.create({
+            const leftElbow = Constraint.create({
                 bodyA: leftUpperArm,
-                pointA: { x: 0, y: 20 },
+                pointA: { x: 0, y: 20 * scale },
                 bodyB: leftLowerArm,
-                pointB: { x: 0, y: -20 },
-                stiffness: 1,
-                length: 0,
+                pointB: { x: 0, y: -20 * scale },
+                stiffness: 0.9,
                 render: { visible: false }
             });
 
-            const chestToRightUpperArm = Constraint.create({
+            const rightShoulder = Constraint.create({
                 bodyA: chest,
-                pointA: { x: 20, y: -20 },
+                pointA: { x: 20 * scale, y: -20 * scale },
                 bodyB: rightUpperArm,
-                pointB: { x: 0, y: -20 },
-                stiffness: 1,
-                length: 0,
+                pointB: { x: 0, y: -20 * scale },
+                stiffness: 0.9,
                 render: { visible: false }
             });
 
-            const rightUpperToLowerArm = Constraint.create({
+            const rightElbow = Constraint.create({
                 bodyA: rightUpperArm,
-                pointA: { x: 0, y: 20 },
+                pointA: { x: 0, y: 20 * scale },
                 bodyB: rightLowerArm,
-                pointB: { x: 0, y: -20 },
-                stiffness: 1,
-                length: 0,
+                pointB: { x: 0, y: -20 * scale },
+                stiffness: 0.9,
                 render: { visible: false }
             });
 
-            const chestToLeftUpperLeg = Constraint.create({
+            const leftHip = Constraint.create({
                 bodyA: chest,
-                pointA: { x: -10, y: 30 },
+                pointA: { x: -10 * scale, y: 30 * scale },
                 bodyB: leftUpperLeg,
-                pointB: { x: 0, y: -25 },
-                stiffness: 1,
-                length: 0,
+                pointB: { x: 0, y: -20 * scale },
+                stiffness: 0.9,
                 render: { visible: false }
             });
 
-            const leftUpperToLowerLeg = Constraint.create({
+            const leftKnee = Constraint.create({
                 bodyA: leftUpperLeg,
-                pointA: { x: 0, y: 25 },
+                pointA: { x: 0, y: 20 * scale },
                 bodyB: leftLowerLeg,
-                pointB: { x: 0, y: -25 },
-                stiffness: 1,
-                length: 0,
+                pointB: { x: 0, y: -20 * scale },
+                stiffness: 0.9,
                 render: { visible: false }
             });
 
-            const chestToRightUpperLeg = Constraint.create({
+            const rightHip = Constraint.create({
                 bodyA: chest,
-                pointA: { x: 10, y: 30 },
+                pointA: { x: 10 * scale, y: 30 * scale },
                 bodyB: rightUpperLeg,
-                pointB: { x: 0, y: -25 },
-                stiffness: 1,
-                length: 0,
+                pointB: { x: 0, y: -20 * scale },
+                stiffness: 0.9,
                 render: { visible: false }
             });
 
-            const rightUpperToLowerLeg = Constraint.create({
+            const rightKnee = Constraint.create({
                 bodyA: rightUpperLeg,
-                pointA: { x: 0, y: 25 },
+                pointA: { x: 0, y: 20 * scale },
                 bodyB: rightLowerLeg,
-                pointB: { x: 0, y: -25 },
-                stiffness: 1,
-                length: 0,
+                pointB: { x: 0, y: -20 * scale },
+                stiffness: 0.9,
                 render: { visible: false }
             });
 
@@ -385,105 +281,48 @@
                     rightLowerLeg
                 ],
                 constraints: [
-                    headToChest,
-                    chestToLeftUpperArm,
-                    leftUpperToLowerArm,
-                    chestToRightUpperArm,
-                    rightUpperToLowerArm,
-                    chestToLeftUpperLeg,
-                    leftUpperToLowerLeg,
-                    chestToRightUpperLeg,
-                    rightUpperToLowerLeg
+                    neck,
+                    leftShoulder,
+                    leftElbow,
+                    rightShoulder,
+                    rightElbow,
+                    leftHip,
+                    leftKnee,
+                    rightHip,
+                    rightKnee
                 ]
             });
 
-            // Add support constraint to hold the ragdoll upright
-            supportConstraint = Constraint.create({
-                pointA: { x: x, y: y - 200 },
-                bodyB: chest,
-                pointB: { x: 0, y: -30 },
-                stiffness: 1,
-                render: { visible: false }
-            });
-            Composite.add(ragdoll, supportConstraint);
-
-            // Define joint limits in radians
-            const joints = [
-                {
-                    bodyA: chest,
-                    bodyB: head,
-                    min: Common.degreesToRadians(-30),
-                    max: Common.degreesToRadians(30)
-                },
-                {
-                    bodyA: chest,
-                    bodyB: leftUpperArm,
-                    min: Common.degreesToRadians(-110),
-                    max: Common.degreesToRadians(110)
-                },
-                {
-                    bodyA: leftUpperArm,
-                    bodyB: leftLowerArm,
-                    min: Common.degreesToRadians(0),
-                    max: Common.degreesToRadians(150)
-                },
-                {
-                    bodyA: chest,
-                    bodyB: rightUpperArm,
-                    min: Common.degreesToRadians(-110),
-                    max: Common.degreesToRadians(110)
-                },
-                {
-                    bodyA: rightUpperArm,
-                    bodyB: rightLowerArm,
-                    min: Common.degreesToRadians(0),
-                    max: Common.degreesToRadians(150)
-                },
-                {
-                    bodyA: chest,
-                    bodyB: leftUpperLeg,
-                    min: Common.degreesToRadians(-30),
-                    max: Common.degreesToRadians(90)
-                },
-                {
-                    bodyA: leftUpperLeg,
-                    bodyB: leftLowerLeg,
-                    min: Common.degreesToRadians(0),
-                    max: Common.degreesToRadians(150)
-                },
-                {
-                    bodyA: chest,
-                    bodyB: rightUpperLeg,
-                    min: Common.degreesToRadians(-30),
-                    max: Common.degreesToRadians(90)
-                },
-                {
-                    bodyA: rightUpperLeg,
-                    bodyB: rightLowerLeg,
-                    min: Common.degreesToRadians(0),
-                    max: Common.degreesToRadians(150)
-                }
-            ];
-
-            // Attach joints to the ragdoll for access in the event handler
-            ragdoll.joints = joints;
+            // Store references for joint angle limits
+            ragdoll.partsMap = {
+                head,
+                chest,
+                leftUpperArm,
+                leftLowerArm,
+                rightUpperArm,
+                rightLowerArm,
+                leftUpperLeg,
+                leftLowerLeg,
+                rightUpperLeg,
+                rightLowerLeg
+            };
 
             return ragdoll;
         }
 
         // Create ground
-        const ground = Bodies.rectangle(width / 2, height + 25, width, 50, {
+        const ground = Bodies.rectangle(width / 2, height - 10, width, 20, {
             isStatic: true,
             friction: 1.0,
             render: { fillStyle: '#2E8B57' }
         });
 
         // Create walls
-        const wallLeft = Bodies.rectangle(-25, height / 2, 50, height, {
+        const wallLeft = Bodies.rectangle(-10, height / 2, 20, height, {
             isStatic: true,
             render: { visible: false }
         });
-        const wallRight = Bodies.rectangle(width + 25, height / 2, 50, height, {
+        const wallRight = Bodies.rectangle(width + 10, height / 2, 20, height, {
             isStatic: true,
             render: { visible: false }
         });
@@ -492,7 +331,7 @@
         World.add(world, [ground, wallLeft, wallRight]);
 
         // Create boxes
-        for (let i = 0; i < 20; i++) {
+        for (let i = 0; i < 10; i++) {
             const box = Bodies.rectangle(
                 Math.random() * width,
                 Math.random() * (height / 2),
@@ -506,8 +345,8 @@
             World.add(world, box);
         }
 
-        // Create ragdoll
-        ragdoll = createRagdoll(width / 2, height - 300);
+        // Create and add the ragdoll
+        let ragdoll = createRagdoll(width / 2, height / 2 - 100, 1);
         World.add(world, ragdoll);
 
         // Mouse control
@@ -522,37 +361,55 @@
         World.add(world, mouseConstraint);
         render.mouse = mouse;
 
-        // Remove support constraint on interaction
-        Events.on(mouseConstraint, 'startdrag', function(event) {
-            if (supportConstraint) {
-                Composite.remove(ragdoll, supportConstraint);
-                supportConstraint = null;
+        // Function to limit joint rotation
+        function limitRotation(bodyA, bodyB, minAngle, maxAngle) {
+            const angle = bodyA.angle - bodyB.angle;
+            if (angle < minAngle) {
+                Body.setAngle(bodyA, bodyB.angle + minAngle);
+                Body.setAngularVelocity(bodyA, 0);
+            } else if (angle > maxAngle) {
+                Body.setAngle(bodyA, bodyB.angle + maxAngle);
+                Body.setAngularVelocity(bodyA, 0);
             }
-        });
+        }
 
-        // Enforce joint angle limits
+        // Limit joint angles for realistic movement
         Events.on(engine, 'beforeUpdate', function(event) {
-            if (ragdoll && ragdoll.joints) {
-                ragdoll.joints.forEach(function(joint) {
-                    let bodyA = joint.bodyA;
-                    let bodyB = joint.bodyB;
-                    let min = joint.min;
-                    let max = joint.max;
+            const {
+                head,
+                chest,
+                leftUpperArm,
+                leftLowerArm,
+                rightUpperArm,
+                rightLowerArm,
+                leftUpperLeg,
+                leftLowerLeg,
+                rightUpperLeg,
+                rightLowerLeg
+            } = ragdoll.partsMap;
 
-                    // Compute the relative angle
-                    let angleA = bodyA.angle;
-                    let angleB = bodyB.angle;
-                    let relativeAngle = normalizeAngle(angleB - angleA);
+            // Head rotation limit (±30 degrees)
+            limitRotation(head, chest, -Math.PI / 6, Math.PI / 6);
 
-                    if (relativeAngle < min) {
-                        Body.setAngle(bodyB, angleA + min);
-                        Body.setAngularVelocity(bodyB, bodyA.angularVelocity);
-                    } else if (relativeAngle > max) {
-                        Body.setAngle(bodyB, angleA + max);
-                        Body.setAngularVelocity(bodyB, bodyA.angularVelocity);
-                    }
-                });
-            }
+            // Left shoulder rotation limit (±90 degrees)
+            limitRotation(leftUpperArm, chest, -Math.PI / 2, Math.PI / 2);
+            // Left elbow rotation limit (0 to 150 degrees)
+            limitRotation(leftLowerArm, leftUpperArm, 0, (5 * Math.PI) / 6);
+
+            // Right shoulder rotation limit (±90 degrees)
+            limitRotation(rightUpperArm, chest, -Math.PI / 2, Math.PI / 2);
+            // Right elbow rotation limit (0 to 150 degrees)
+            limitRotation(rightLowerArm, rightUpperArm, 0, (5 * Math.PI) / 6);
+
+            // Left hip rotation limit (-30 to 90 degrees)
+            limitRotation(leftUpperLeg, chest, -Math.PI / 6, Math.PI / 2);
+            // Left knee rotation limit (0 to 150 degrees)
+            limitRotation(leftLowerLeg, leftUpperLeg, 0, (5 * Math.PI) / 6);
+
+            // Right hip rotation limit (-30 to 90 degrees)
+            limitRotation(rightUpperLeg, chest, -Math.PI / 6, Math.PI / 2);
+            // Right knee rotation limit (0 to 150 degrees)
+            limitRotation(rightLowerLeg, rightUpperLeg, 0, (5 * Math.PI) / 6);
         });
 
         // Control buttons
@@ -580,7 +437,7 @@
             World.add(world, [ground, wallLeft, wallRight]);
 
             // Add boxes
-            for (let i = 0; i < 20; i++) {
+            for (let i = 0; i < 10; i++) {
                 const box = Bodies.rectangle(
                     Math.random() * width,
                     Math.random() * (height / 2),
@@ -595,7 +452,7 @@
             }
 
             // Create and add ragdoll
-            ragdoll = createRagdoll(width / 2, height - 300);
+            ragdoll = createRagdoll(width / 2, height / 2 - 100, 1);
             World.add(world, ragdoll);
 
             // Restart the runner if it was stopped
