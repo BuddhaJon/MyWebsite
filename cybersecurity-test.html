@@ -30,33 +30,51 @@
             color: #fff;
         }
 
-        /* Style for the review page */
-        .review-page {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center; /* Center the review question boxes */
+        /* Style for the review page with columns */
+.review-page {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px; /* Reduced gap to save space */
+    justify-content: space-between; /* Spread columns to edges */
+}
+
+/* Domain column styling */
+.domain-column {
+    flex: 1 1 calc(20% - 20px); /* Adjusted for five columns */
+    min-width: 150px; /* Allow columns to shrink */
+}
+
+.domain-column h3 {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+
+        .review-question-list {
+            list-style-type: none;
+            padding: 0;
         }
 
+        .review-question-list li {
+            margin-bottom: 5px;
+        }
+
+        /* Adjusted review question button */
         .review-question {
-            width: 60px;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: block;
+            padding: 10px;
             background-color: #6c757d;
             color: #fff;
             text-decoration: none;
             border-radius: 4px;
-            position: relative;
-            font-size: 18px;
+            text-align: center;
+            font-size: 16px;
         }
 
         .review-question.answered {
             background-color: #28a745;
         }
 
-        /* Change background color for flagged questions */
         .review-question.flagged {
             background-color: #ffc107;
             color: #212529;
@@ -89,22 +107,60 @@
         }
 
         /* Common button styles */
-.btn {
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    background-color: #007bff; /* Adjust the color as needed */
-    color: #fff; /* White text */
-    border: none;
-    border-radius: 4px;
-}
+        .btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #007bff; /* Adjust the color as needed */
+            color: #fff; /* White text */
+            border: none;
+            border-radius: 4px;
+        }
 
-.btn:hover {
-    background-color: #0056b3; /* Darker shade on hover */
-}
+        .btn:hover {
+            background-color: #0056b3; /* Darker shade on hover */
+        }
 
+        /* Style for the test container */
+        .test-container {
+            max-width: 2000px;
+            margin: 0 auto;
+        }
 
-        /* Other styles remain the same... */
+        /* Style for options list */
+        .options {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .options li {
+            margin-bottom: 10px;
+        }
+
+        .options label {
+            margin-left: 5px;
+        }
+
+        /* Style for explanations */
+        .explanations {
+            margin-top: 20px;
+        }
+
+        .explanation {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .explanation h3 {
+            margin-top: 0;
+        }
+
+        /* Style for breakdown */
+        .breakdown {
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -131,13 +187,12 @@
                 <div class="top-buttons">
                     <button id="prev-button" class="btn" disabled>Previous</button>
                     <button id="next-button" class="btn">Next</button>
-                    <button id="submit-button" class="btn">Submit</button>
+                    <button id="submit-button" class="btn" style="display: none;">Submit</button>
                 </div>
                 <div class="bottom-buttons">
                     <button id="review-button" class="btn">Review</button>
                 </div>
             </div>
-            
         </section>
     </main>
 
@@ -160,6 +215,7 @@
             { name: "Security Program Management and Oversight", percentage: 20, questions: [] },
         ];
 
+        // Include your refined and more challenging questions here
         const allQuestions = [
     {
         domain: "General Security Concepts",
@@ -1520,7 +1576,8 @@
     explanation: "Insider threat awareness programs help employees recognize signs of insider threats and know how to report them.",
     type: "single"
 }
-]
+];
+
 
         // Distribute questions into domains
         function distributeQuestions() {
@@ -1623,7 +1680,6 @@
             }
         }
 
-
         function saveAnswer() {
             const q = questions[currentQuestionIndex];
             let selectedOptions = [];
@@ -1639,7 +1695,6 @@
 
             userAnswers[currentQuestionIndex] = selectedOptions;
         }
-
 
         document.getElementById('next-button').addEventListener('click', () => {
             saveAnswer();
@@ -1668,49 +1723,73 @@
             const container = document.getElementById('question-container');
             container.innerHTML = '<h2>Review Questions</h2>';
 
+            // Submit button
+            const finalSubmitButton = document.createElement('button');
+            finalSubmitButton.textContent = 'Submit Test';
+            finalSubmitButton.className = 'btn';
+            finalSubmitButton.addEventListener('click', () => {
+                showResults();
+            });
+
+            // Center the submit button
+            finalSubmitButton.style.display = 'block';
+            finalSubmitButton.style.margin = '20px auto';
+
+            container.appendChild(finalSubmitButton);
+
+            // Create the main review container
             const reviewContainer = document.createElement('div');
             reviewContainer.className = 'review-page';
 
-            questions.forEach((q, index) => {
-                const questionButton = document.createElement('a');
-                questionButton.href = '#';
-                questionButton.className = 'review-question';
-                questionButton.textContent = index + 1;
+            // Group questions by domain
+            domains.forEach(domain => {
+                // Create a column for each domain
+                const domainColumn = document.createElement('div');
+                domainColumn.className = 'domain-column';
 
-                // Indicate if the question is answered
-                if (userAnswers[index] && userAnswers[index].length > 0) {
-                    questionButton.classList.add('answered');
-                }
+                // Domain heading
+                const domainHeading = document.createElement('h3');
+                domainHeading.textContent = domain.name;
+                domainColumn.appendChild(domainHeading);
 
-                // Indicate if the question is flagged
-                if (flaggedQuestions.includes(index)) {
-                    questionButton.classList.add('flagged');
-                }
+                // List of questions under the domain
+                const questionList = document.createElement('ul');
+                questionList.className = 'review-question-list';
 
-                questionButton.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    currentQuestionIndex = index;
-                    showQuestion(currentQuestionIndex);
+                domain.questions.forEach(q => {
+                    const index = questions.indexOf(q);
+                    const questionItem = document.createElement('li');
+
+                    const questionButton = document.createElement('a');
+                    questionButton.href = '#';
+                    questionButton.className = 'review-question';
+                    questionButton.textContent = `Question ${index + 1}`;
+
+                    // Indicate if the question is answered
+                    if (userAnswers[index] && userAnswers[index].length > 0) {
+                        questionButton.classList.add('answered');
+                    }
+
+                    // Indicate if the question is flagged
+                    if (flaggedQuestions.includes(index)) {
+                        questionButton.classList.add('flagged');
+                    }
+
+                    questionButton.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        currentQuestionIndex = index;
+                        showQuestion(currentQuestionIndex);
+                    });
+
+                    questionItem.appendChild(questionButton);
+                    questionList.appendChild(questionItem);
                 });
 
-                reviewContainer.appendChild(questionButton);
+                domainColumn.appendChild(questionList);
+                reviewContainer.appendChild(domainColumn);
             });
 
             container.appendChild(reviewContainer);
-
-            // Submit button
-    const finalSubmitButton = document.createElement('button');
-    finalSubmitButton.textContent = 'Submit Test';
-    finalSubmitButton.className = 'btn'; // Assign the 'btn' class
-    finalSubmitButton.addEventListener('click', () => {
-        showResults();
-    });
-
-    // Center the submit button
-    finalSubmitButton.style.display = 'block';
-    finalSubmitButton.style.margin = '20px auto';
-
-            container.appendChild(finalSubmitButton);
 
             // Hide navigation buttons on the review page
             document.querySelector('.navigation-buttons').style.display = 'none';
@@ -1777,6 +1856,8 @@
             retakeButton.addEventListener('click', () => {
                 resetTest();
             });
+            retakeButton.style.display = 'block';
+            retakeButton.style.margin = '20px auto';
             container.appendChild(retakeButton);
 
             // Explanations
