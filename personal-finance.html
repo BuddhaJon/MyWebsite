@@ -6,6 +6,8 @@
     <link rel="stylesheet" href="style.css"> <!-- Importing the global stylesheet -->
     <link rel="icon" href="pictures/favicon.png" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Include Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <!-- Consistent header -->
@@ -21,151 +23,186 @@
         </nav>
     </header>
 
-<style>
-/* Finance tools specific styles */
+    <style>
+    /* Finance tools specific styles */
 
-/* Tool buttons section */
-.tool-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    margin-bottom: 40px;
-    padding: 20px 0; /* Add padding to separate buttons from surrounding content */
-    background-color: #f8f9fa; /* Light background to visually separate buttons */
-    border-bottom: 2px solid #ccc; /* Subtle border for separation */
-}
-
-.tool-buttons button {
-    background-color: #6b5b95; /* Purple background */
-    color: white;
-    padding: 15px 30px; /* Larger padding for better clickability */
-    font-size: 1.2rem;
-    border: none;
-    border-radius: 8px; /* Slightly more rounded corners */
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-}
-
-.tool-buttons button:hover {
-    background-color: #5a4b82; /* Darker purple on hover */
-    transform: translateY(-2px); /* Slight lift effect on hover */
-    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15); /* Enhance shadow on hover */
-}
-
-/* Active button styling */
-.tool-buttons button.active {
-    background-color: #4e3d63; /* Even darker purple for the active state */
-    color: #e4d7f7; /* Softer white for contrast */
-}
-
-/* Individual tool sections */
-.tool-section {
-    display: none;
-    padding: 20px;
-    background-color: white;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.tool-section.active {
-    display: block;
-}
-
-/* Form styling within the tools */
-.tool-section form {
-    display: inline-block;
-    text-align: left;
-    width: 100%;
-}
-
-.tool-section form div {
-    margin-bottom: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.tool-section label {
-    display: inline-block;
-    width: 150px;
-    font-weight: bold;
-    text-align: right;
-    margin-right: 10px;
-}
-
-.tool-section input[type="number"],
-.tool-section input[type="text"],
-.tool-section select {
-    width: 60%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 1rem;
-}
-
-.tool-section button {
-    background-color: #28a745;
-    color: white;
-    padding: 10px 20px;
-    font-size: 1rem;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    display: block;
-    margin: 0 auto;
-}
-
-.tool-section button:hover {
-    background-color: #218838;
-}
-
-/* Error messages */
-.tool-section .error-message {
-    color: red;
-    font-weight: bold;
-    margin-top: 10px;
-}
-
-/* Responsive styles */
-@media screen and (max-width: 768px) {
-    .tool-buttons {
+    /* Expense list container for Budgeting Tool */
+    #budgeting-tool #expense-list {
+        margin-top: 10px;
+        display: flex;
         flex-direction: column;
-        gap: 15px;
-        padding: 15px 0;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    #budgeting-tool #expense-list div {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        align-items: center;
+    }
+
+    #budgeting-tool #expense-list input[type="text"] {
+        flex: 1;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    #budgeting-tool #expense-list button.remove-expense {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 8px 12px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    #budgeting-tool #expense-list button.remove-expense:hover {
+        background-color: #c82333;
+    }
+
+    .tool-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 120px; /* Increased gap between buttons */
+        margin-bottom: 40px;
+        padding: 20px 0;
+        background-color: #f8f9fa;
+        border-bottom: 2px solid #ccc;
     }
 
     .tool-buttons button {
-        width: 100%;
+        background-color: #6b5b95;
+        color: white;
+        padding: 15px 30px;
+        font-size: 1.2rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .tool-buttons button:hover {
+        background-color: #5a4b82;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .tool-buttons button.active {
+        background-color: #4e3d63;
+        color: #e4d7f7;
     }
 
     .tool-section {
-        width: 90%;
+        display: none;
+        padding: 20px;
+        background-color: white;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .tool-section.active {
+        display: block;
+    }
+
+    .tool-section form {
+        display: inline-block;
+        text-align: left;
+        width: 100%;
     }
 
     .tool-section form div {
-        flex-direction: column;
-        align-items: flex-start;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
     }
 
     .tool-section label {
-        text-align: left;
-        margin-bottom: 5px;
+        display: inline-block;
+        width: 150px;
+        font-weight: bold;
+        text-align: right;
+        margin-right: 10px;
     }
 
-    .tool-section input[type="number"],
     .tool-section input[type="text"],
     .tool-section select {
-        width: 100%;
+        width: 60%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 1rem;
     }
-}
-</style>
 
-        
+    .tool-section button {
+        background-color: #28a745;
+        color: white;
+        padding: 10px 20px;
+        font-size: 1rem;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        display: block;
+        margin: 0 auto;
+    }
+
+    .tool-section button:hover {
+        background-color: #218838;
+    }
+
+    /* Additional spacing for the calculate buttons */
+    .calc-button {
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+
+    .tool-section .error-message {
+        color: red;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+
+    @media screen and (max-width: 768px) {
+        .tool-buttons {
+            flex-direction: column;
+            gap: 15px;
+            padding: 15px 0;
+        }
+
+        .tool-buttons button {
+            width: 100%;
+        }
+
+        .tool-section {
+            width: 90%;
+        }
+
+        .tool-section form div {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .tool-section label {
+            text-align: left;
+            margin-bottom: 5px;
+            width: 100%;
+        }
+
+        .tool-section input[type="text"],
+        .tool-section select {
+            width: 100%;
+        }
+    }
+    </style>
+
     <main>
         <h1>Personal Finance Tools</h1>
         <div class="tool-buttons">
@@ -174,12 +211,13 @@
             <button class="tab-link" onclick="openTool(event, 'inflation-calculator')">Inflation Calculator</button>
         </div>
 
+        <!-- Budgeting Tool Section -->
         <div id="budgeting-tool" class="tool-section active">
             <h2>Budgeting Tool</h2>
             <form id="budget-form">
                 <div>
                     <label for="income">Monthly Income:</label>
-                    <input type="number" id="income" name="income" required>
+                    <input type="text" class="number-input" id="income" name="income" required>
                 </div>
                 <div id="expense-list">
                     <h3>Expenses:</h3>
@@ -187,59 +225,71 @@
                 </div>
                 <button type="button" onclick="addExpense()">Add Expense</button>
                 <br>
-                <button type="button" onclick="calculateBudget()">Calculate Budget</button>
+                <button type="button" class="calc-button" onclick="calculateBudget()">Calculate Budget</button>
                 <p id="budget-error" class="error-message"></p>
             </form>
             <p id="budget-result"></p>
+            <!-- Canvas for Budget Pie Chart -->
+            <canvas id="budget-chart" width="400" height="400"></canvas>
         </div>
 
+        <!-- Interest Calculator Section -->
         <div id="interest-calculator" class="tool-section">
             <h2>Interest Calculator</h2>
             <form id="interest-form">
                 <div>
                     <label for="principal">Principal Amount:</label>
-                    <input type="number" id="principal" name="principal" required>
+                    <input type="text" class="number-input" id="principal" name="principal" required>
                 </div>
                 <div>
                     <label for="rate">Annual Interest Rate (%):</label>
-                    <input type="number" id="rate" name="rate" required>
+                    <input type="text" class="number-input" id="rate" name="rate" required>
                 </div>
                 <div>
                     <label for="years">Number of Years:</label>
-                    <input type="number" id="years" name="years" required>
+                    <input type="text" class="number-input" id="years" name="years" required>
                 </div>
                 <div>
                     <label for="compounding">Compounding:</label>
-                    <input type="checkbox" id="compounding" name="compounding" onchange="toggleCompoundingOptions()">
+                    <div style="width:60%; display:flex; align-items:center;">
+                        <input type="checkbox" id="compounding" name="compounding" onchange="toggleCompoundingOptions()" style="margin-left:10px;">
+                    </div>
                 </div>
                 <div id="compounding-options" style="display: none;">
                     <label for="compound-frequency">Compounding Frequency:</label>
                     <select id="compound-frequency" name="compound-frequency">
                         <option value="annual">Annually</option>
+                        <option value="quarterly">Quarterly</option>
                         <option value="monthly">Monthly</option>
+                        <option value="daily">Daily</option>
                     </select>
                 </div>
-                <button type="button" onclick="calculateInterest()">Calculate Interest</button>
+                <button type="button" class="calc-button" onclick="calculateInterest()">Calculate Interest</button>
                 <p id="interest-error" class="error-message"></p>
             </form>
             <p id="interest-result"></p>
+            <!-- Canvas for Interest Line Chart -->
+            <canvas id="interest-chart" width="600" height="400"></canvas>
         </div>
 
+        <!-- Inflation Calculator Section -->
         <div id="inflation-calculator" class="tool-section">
             <h2>Inflation Calculator</h2>
             <form id="inflation-form">
                 <div>
                     <label for="current-amount">Current Amount:</label>
-                    <input type="number" id="current-amount" name="current-amount" required>
+                    <input type="text" class="number-input" id="current-amount" name="current-amount" required>
                 </div>
                 <div>
                     <label for="inflation-years">Number of Years:</label>
-                    <input type="number" id="inflation-years" name="inflation-years" required>
+                    <input type="text" class="number-input" id="inflation-years" name="inflation-years" required>
                 </div>
-                <button type="button" onclick="calculateInflation()">Calculate Future Value</button>
+                <button type="button" class="calc-button" onclick="calculateInflation()">Calculate Future Value</button>
                 <p id="inflation-error" class="error-message"></p>
             </form>
             <p id="inflation-result"></p>
+            <!-- Canvas for Inflation Line Chart -->
+            <canvas id="inflation-chart" width="600" height="400"></canvas>
         </div>
     </main>
 
@@ -247,195 +297,394 @@
         <p>Developed by Jonathan Rothe</p>
     </footer>
 
-
-    <!-- JavaScript Functions -->
     <script>
+    function openTool(event, toolId) {
+        const tabs = document.querySelectorAll('.tool-section');
+        const buttons = document.querySelectorAll('.tab-link');
 
-function openTool(event, toolId) {
-            const tabs = document.querySelectorAll('.tool-section');
-            const buttons = document.querySelectorAll('.tab-link');
+        tabs.forEach(tab => tab.classList.remove('active'));
+        buttons.forEach(button => button.classList.remove('active'));
 
-            tabs.forEach(tab => tab.classList.remove('active'));
-            buttons.forEach(button => button.classList.remove('active'));
+        document.getElementById(toolId).classList.add('active');
+        event.target.classList.add('active');
+    }
 
-            document.getElementById(toolId).classList.add('active');
-            event.target.classList.add('active');
+    // Helper function to format numbers with commas and two decimals
+    function formatNumber(num) {
+        return num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    // Format number input fields with commas as the user types
+    function formatNumberInput(input) {
+        let value = input.value.replace(/[^0-9.]/g, '');
+        const parts = value.split('.');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        if (parts[1]) {
+            parts[1] = parts[1].substring(0, 2);
+        }
+        input.value = parts.join('.');
+    }
+
+    // Attach event listeners to number input fields
+    function addNumberFormatting() {
+        const numberInputs = document.querySelectorAll('.number-input');
+        numberInputs.forEach(input => {
+            input.addEventListener('input', function() {
+                formatNumberInput(this);
+            });
+        });
+    }
+
+    window.onload = function() {
+        addNumberFormatting();
+    };
+
+    // Budgeting Tool Functions
+    let expenseCount = 0;
+
+    function addExpense() {
+        expenseCount++;
+        const expenseList = document.getElementById('expense-list');
+        const expenseDiv = document.createElement('div');
+        expenseDiv.id = 'expense-' + expenseCount;
+        expenseDiv.innerHTML = `
+            <input type="text" placeholder="Expense Name" id="expense-name-${expenseCount}">
+            <input type="text" class="number-input" placeholder="Amount" id="expense-amount-${expenseCount}">
+            <button type="button" class="remove-expense" onclick="removeExpense(${expenseCount})">Remove</button>
+        `;
+        expenseList.appendChild(expenseDiv);
+        const newExpenseAmountInput = document.getElementById('expense-amount-' + expenseCount);
+        newExpenseAmountInput.addEventListener('input', function() {
+            formatNumberInput(this);
+        });
+    }
+
+    function removeExpense(id) {
+        const expenseDiv = document.getElementById('expense-' + id);
+        expenseDiv.remove();
+    }
+
+    function calculateBudget() {
+        const incomeInput = document.getElementById('income');
+        const income = parseFloat(incomeInput.value.replace(/,/g, ''));
+
+        if (isNaN(income) || income < 0) {
+            document.getElementById('budget-error').textContent = 'Please enter a valid income amount.';
+            document.getElementById('budget-result').textContent = '';
+            return;
+        } else {
+            document.getElementById('budget-error').textContent = '';
         }
 
-        // Helper function to format numbers with commas
-        function formatNumber(num) {
-            return num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        }
+        let totalExpenses = 0;
+        let validExpenses = true;
+        const expenseNames = [];
+        const expenseAmounts = [];
 
-        // Budgeting Tool Functions
-        let expenseCount = 0;
+        // Distinct palette avoiding greens similar to #006400
+        // Surplus will be #006400
+        const expensePalette = ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40", "#8B4513", "#1E90FF"];
+        let expenseColorIndex = 0;
 
-        function addExpense() {
-            expenseCount++;
-            const expenseList = document.getElementById('expense-list');
-            const expenseDiv = document.createElement('div');
-            expenseDiv.id = 'expense-' + expenseCount;
-            expenseDiv.innerHTML = `
-                <input type="text" placeholder="Expense Name" id="expense-name-${expenseCount}">
-                <input type="number" placeholder="Amount" id="expense-amount-${expenseCount}">
-                <button type="button" onclick="removeExpense(${expenseCount})">Remove</button>
-            `;
-            expenseList.appendChild(expenseDiv);
-        }
+        for (let i = 1; i <= expenseCount; i++) {
+            const expenseAmountInput = document.getElementById('expense-amount-' + i);
+            const expenseNameInput = document.getElementById('expense-name-' + i);
+            if (expenseAmountInput && expenseNameInput) {
+                const amount = parseFloat(expenseAmountInput.value.replace(/,/g, ''));
+                const name = expenseNameInput.value || 'Expense ' + i;
 
-        function removeExpense(id) {
-            const expenseDiv = document.getElementById('expense-' + id);
-            expenseDiv.remove();
-        }
+                if (isNaN(amount) || amount < 0) {
+                    validExpenses = false;
+                    break;
+                }
 
-        function calculateBudget() {
-            const incomeInput = document.getElementById('income');
-            const incomeValue = incomeInput.value.replace(/[\$,]/g, '');
-            const income = parseFloat(incomeValue);
-
-            if (isNaN(income) || income < 0) {
-                document.getElementById('budget-error').textContent = 'Please enter a valid income amount.';
-                document.getElementById('budget-result').textContent = '';
-                return;
-            } else {
-                document.getElementById('budget-error').textContent = '';
+                totalExpenses += amount;
+                expenseNames.push(name);
+                expenseAmounts.push(amount);
             }
+        }
 
-            let totalExpenses = 0;
-            let validExpenses = true;
+        if (!validExpenses) {
+            document.getElementById('budget-error').textContent = 'Please enter valid expense amounts.';
+            document.getElementById('budget-result').textContent = '';
+            return;
+        } else {
+            document.getElementById('budget-error').textContent = '';
+        }
 
-            for (let i = 1; i <= expenseCount; i++) {
-                const expenseAmountInput = document.getElementById('expense-amount-' + i);
-                if (expenseAmountInput) {
-                    const expenseValue = expenseAmountInput.value.replace(/[\$,]/g, '');
-                    const expenseAmount = parseFloat(expenseValue);
+        const balance = income - totalExpenses;
+        let resultText;
 
-                    if (isNaN(expenseAmount) || expenseAmount < 0) {
-                        validExpenses = false;
-                        break;
+        if (balance > 0) {
+            resultText = `On a monthly income of $${formatNumber(income)} while paying a total of $${formatNumber(totalExpenses)} for all expenses, you will have a surplus of $${formatNumber(balance)}.`;
+
+            // Add Surplus slice to pie chart
+            expenseNames.push('Surplus');
+            expenseAmounts.push(balance);
+        } else if (balance < 0) {
+            resultText = `On a monthly income of $${formatNumber(income)} while paying a total of $${formatNumber(totalExpenses)} for all expenses, you will have a deficit of $${formatNumber(Math.abs(balance))}.`;
+        } else {
+            resultText = `On a monthly income of $${formatNumber(income)} while paying a total of $${formatNumber(totalExpenses)} for all expenses, your budget is balanced.`;
+        }
+
+        document.getElementById('budget-result').textContent = resultText;
+
+        // Generate Pie Chart
+        const ctx = document.getElementById('budget-chart').getContext('2d');
+        const existingChart = Chart.getChart('budget-chart');
+        if (existingChart) {
+            existingChart.destroy();
+        }
+
+        const colors = [];
+        for (let i = 0; i < expenseAmounts.length; i++) {
+            if (expenseNames[i] === 'Surplus') {
+                colors.push('#006400'); // Dark green for surplus
+            } else {
+                // Cycle through the expensePalette for other expenses
+                colors.push(expensePalette[expenseColorIndex % expensePalette.length]);
+                expenseColorIndex++;
+            }
+        }
+
+        const chartData = {
+            labels: expenseNames,
+            datasets: [{
+                data: expenseAmounts,
+                backgroundColor: colors,
+            }]
+        };
+
+        new Chart(ctx, {
+            type: 'pie',
+            data: chartData,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Expense Breakdown'
                     }
-
-                    totalExpenses += expenseAmount;
                 }
-            }
+            },
+        });
+    }
 
-            if (!validExpenses) {
-                document.getElementById('budget-error').textContent = 'Please enter valid expense amounts.';
-                document.getElementById('budget-result').textContent = '';
-                return;
-            } else {
-                document.getElementById('budget-error').textContent = '';
-            }
+    // Interest Calculator Functions
+    function toggleCompoundingOptions() {
+        const compounding = document.getElementById('compounding').checked;
+        const optionsDiv = document.getElementById('compounding-options');
+        optionsDiv.style.display = compounding ? 'block' : 'none';
+    }
 
-            const balance = income - totalExpenses;
+    function calculateInterest() {
+        const principalInput = document.getElementById('principal');
+        const rateInput = document.getElementById('rate');
+        const yearsInput = document.getElementById('years');
 
-            let resultText;
-            if (balance > 0) {
-                resultText = 'You have a surplus of $' + formatNumber(balance) + ' this month.';
-            } else if (balance < 0) {
-                resultText = 'You have a deficit of $' + formatNumber(Math.abs(balance)) + ' this month.';
-            } else {
-                resultText = 'Your budget is balanced this month.';
-            }
+        const principal = parseFloat(principalInput.value.replace(/,/g, ''));
+        const rate = parseFloat(rateInput.value.replace(/,/g, '')) / 100;
+        const years = parseInt(yearsInput.value.replace(/,/g, ''));
 
-            document.getElementById('budget-result').textContent = resultText;
+        if (isNaN(principal) || principal < 0) {
+            document.getElementById('interest-error').textContent = 'Please enter a valid principal amount.';
+            document.getElementById('interest-result').textContent = '';
+            return;
         }
 
-        // Interest Calculator Functions
-        function toggleCompoundingOptions() {
-            const compounding = document.getElementById('compounding').checked;
-            const optionsDiv = document.getElementById('compounding-options');
-            optionsDiv.style.display = compounding ? 'block' : 'none';
+        if (isNaN(rate) || rate < 0) {
+            document.getElementById('interest-error').textContent = 'Please enter a valid interest rate.';
+            document.getElementById('interest-result').textContent = '';
+            return;
         }
 
-        function calculateInterest() {
-            const principalInput = document.getElementById('principal');
-            const rateInput = document.getElementById('rate');
-            const yearsInput = document.getElementById('years');
+        if (isNaN(years) || years <= 0) {
+            document.getElementById('interest-error').textContent = 'Please enter a valid number of years.';
+            document.getElementById('interest-result').textContent = '';
+            return;
+        }
 
-            const principalValue = principalInput.value.replace(/[\$,]/g, '');
-            const rateValue = rateInput.value.replace(/[\$,]/g, '');
-            const yearsValue = yearsInput.value.replace(/[\$,]/g, '');
+        document.getElementById('interest-error').textContent = '';
 
-            const principal = parseFloat(principalValue);
-            const rate = parseFloat(rateValue) / 100;
-            const years = parseFloat(yearsValue);
+        const compounding = document.getElementById('compounding').checked;
+        let compoundingText = 'with simple interest';
+        let n = 1;
 
-            if (isNaN(principal) || principal < 0) {
-                document.getElementById('interest-error').textContent = 'Please enter a valid principal amount.';
-                document.getElementById('interest-result').textContent = '';
-                return;
-            }
-
-            if (isNaN(rate) || rate < 0) {
-                document.getElementById('interest-error').textContent = 'Please enter a valid interest rate.';
-                document.getElementById('interest-result').textContent = '';
-                return;
-            }
-
-            if (isNaN(years) || years < 0) {
-                document.getElementById('interest-error').textContent = 'Please enter a valid number of years.';
-                document.getElementById('interest-result').textContent = '';
-                return;
-            }
-
-            document.getElementById('interest-error').textContent = '';
-
-            const compounding = document.getElementById('compounding').checked;
-
-            let amount, interestEarned;
-
-            if (compounding) {
-                const frequency = document.getElementById('compound-frequency').value;
-                let n; // Number of times interest is compounded per year
-                if (frequency === 'monthly') {
+        if (compounding) {
+            const frequency = document.getElementById('compound-frequency').value;
+            switch (frequency) {
+                case 'daily':
+                    n = 365;
+                    compoundingText = 'compounded daily';
+                    break;
+                case 'monthly':
                     n = 12;
-                } else {
+                    compoundingText = 'compounded monthly';
+                    break;
+                case 'quarterly':
+                    n = 4;
+                    compoundingText = 'compounded quarterly';
+                    break;
+                case 'annual':
+                default:
                     n = 1;
-                }
-                amount = principal * Math.pow(1 + rate / n, n * years);
+                    compoundingText = 'compounded annually';
+                    break;
+            }
+        }
+
+        let amount;
+        if (compounding) {
+            amount = principal * Math.pow(1 + rate / n, n * years);
+        } else {
+            amount = principal * (1 + rate * years);
+        }
+
+        const interestEarned = amount - principal;
+
+        // Updated description:
+        // "After X years, the amount of interest on X principal compounded X will be X, resulting in a total value of X"
+        const resultText = `After ${years} years, the amount of interest on $${formatNumber(principal)} principal ${compoundingText} will be $${formatNumber(interestEarned)}, resulting in a total value of $${formatNumber(amount)}.`;
+        document.getElementById('interest-result').textContent = resultText;
+
+        // Prepare data for the chart
+        const dataPoints = [];
+        for (let i = 0; i <= years; i++) {
+            let yearlyAmount;
+            if (compounding) {
+                yearlyAmount = principal * Math.pow(1 + rate / n, n * i);
             } else {
-                amount = principal * (1 + rate * years);
+                yearlyAmount = principal * (1 + rate * i);
             }
-
-            interestEarned = amount - principal;
-
-            const resultText = `After ${years} years, your ${compounding ? 'compounded ' : ''}investment will be worth $${formatNumber(amount)}, earning $${formatNumber(interestEarned)} in interest.`;
-            document.getElementById('interest-result').textContent = resultText;
+            dataPoints.push({ x: i, y: yearlyAmount });
         }
 
-        // Inflation Calculator Function
-        function calculateInflation() {
-            const currentAmountInput = document.getElementById('current-amount');
-            const yearsInput = document.getElementById('inflation-years');
-
-            const currentAmountValue = currentAmountInput.value.replace(/[\$,]/g, '');
-            const yearsValue = yearsInput.value.replace(/[\$,]/g, '');
-
-            const currentAmount = parseFloat(currentAmountValue);
-            const years = parseFloat(yearsValue);
-
-            if (isNaN(currentAmount) || currentAmount < 0) {
-                document.getElementById('inflation-error').textContent = 'Please enter a valid current amount.';
-                document.getElementById('inflation-result').textContent = '';
-                return;
-            }
-
-            if (isNaN(years) || years < 0) {
-                document.getElementById('inflation-error').textContent = 'Please enter a valid number of years.';
-                document.getElementById('inflation-result').textContent = '';
-                return;
-            }
-
-            document.getElementById('inflation-error').textContent = '';
-
-            const averageInflationRate = 0.03; // Estimated average inflation rate (3%)
-
-            const futureValue = currentAmount * Math.pow(1 + averageInflationRate, years);
-
-            const resultText = `In ${years} years, $${formatNumber(currentAmount)} will be equivalent to $${formatNumber(futureValue)} due to estimated inflation.`;
-            document.getElementById('inflation-result').textContent = resultText;
+        // Generate Line Chart
+        const ctx = document.getElementById('interest-chart').getContext('2d');
+        const existingChart = Chart.getChart('interest-chart');
+        if (existingChart) {
+            existingChart.destroy();
         }
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                datasets: [{
+                    label: 'Investment Growth Over Time',
+                    data: dataPoints,
+                    fill: true,
+                    backgroundColor: 'rgba(192,192,192,0.5)', // Grey fill
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        type: 'linear',
+                        position: 'bottom',
+                        title: {
+                            display: true,
+                            text: 'Years'
+                        },
+                        ticks: {
+                            precision: 0
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Amount ($)'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Inflation Calculator Function
+    function calculateInflation() {
+        const currentAmountInput = document.getElementById('current-amount');
+        const yearsInput = document.getElementById('inflation-years');
+
+        const currentAmount = parseFloat(currentAmountInput.value.replace(/,/g, ''));
+        const years = parseInt(yearsInput.value.replace(/,/g, ''));
+
+        if (isNaN(currentAmount) || currentAmount < 0) {
+            document.getElementById('inflation-error').textContent = 'Please enter a valid current amount.';
+            document.getElementById('inflation-result').textContent = '';
+            return;
+        }
+
+        if (isNaN(years) || years <= 0) {
+            document.getElementById('inflation-error').textContent = 'Please enter a valid number of years.';
+            document.getElementById('inflation-result').textContent = '';
+            return;
+        }
+
+        document.getElementById('inflation-error').textContent = '';
+
+        const averageInflationRate = 0.03; // Estimated average inflation rate (3%)
+
+        const adjustedValue = currentAmount / Math.pow(1 + averageInflationRate, years);
+
+        const resultText = `In ${years} years, $${formatNumber(currentAmount)} will have the purchasing power of $${formatNumber(adjustedValue)} due to estimated inflation.`;
+        document.getElementById('inflation-result').textContent = resultText;
+
+        // Prepare data for the chart (decreasing line)
+        const dataPoints = [];
+        for (let i = 0; i <= years; i++) {
+            const value = currentAmount / Math.pow(1 + averageInflationRate, i);
+            dataPoints.push({ x: i, y: value });
+        }
+
+        // Generate Line Chart
+        const ctx = document.getElementById('inflation-chart').getContext('2d');
+        const existingChart = Chart.getChart('inflation-chart');
+        if (existingChart) {
+            existingChart.destroy();
+        }
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                datasets: [{
+                    label: 'Decreasing Purchasing Power Over Time',
+                    data: dataPoints,
+                    fill: true,
+                    backgroundColor: 'rgba(192,192,192,0.5)', // Grey fill
+                    borderColor: 'rgb(255, 99, 132)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        type: 'linear',
+                        position: 'bottom',
+                        title: {
+                            display: true,
+                            text: 'Years'
+                        },
+                        ticks: {
+                            precision: 0
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Value ($)'
+                        }
+                    }
+                }
+            }
+        });
+    }
     </script>
 </body>
 </html>
