@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cybersecurity Escape Room</title>
+    <link rel="icon" href="pictures/favicon.png" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Optional global stylesheet -->
+    <link rel="stylesheet" href="style.css">
+    <style>
+        main.game-page {
+            padding: 0;
+            margin: 0;
+        }
+
+        #game-container {
+            width: 100%;
+            max-width: 800px;
+            height: 600px;
+            margin: 0 auto;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            box-sizing: border-box;
+        }
+
+        #game-canvas {
+            width: 100%;
+            height: 500px;
+            display: block;
+            background-color: #ddd;
+            border: 1px solid #ccc;
+            margin-top: 20px;
+        }
+
+        .button-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .button-container button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .button-container button:hover {
+            background-color: #b32a36;
+        }
+
+        .puzzle-input-container {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .puzzle-input-container input[type="text"] {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            width: 300px;
+        }
+
+        .puzzle-input-container button {
+            background-color: #28a745;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .puzzle-input-container button:hover {
+            background-color: #218838;
+        }
+
+        .status-message {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Jonathan Rothe</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About Me</a></li>
+                <li><a href="resume.html">My Resume</a></li>
+                <li><a href="projects.html">Projects</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="game-page">
+        <h1>Cybersecurity Escape Room</h1>
+
+        <div id="game-container">
+            <canvas id="game-canvas"></canvas>
+            <div class="puzzle-input-container" style="display:none;" id="input-section">
+                <input type="text" id="player-answer" placeholder="Enter your answer here...">
+                <button type="button" id="submit-button">Submit</button>
+            </div>
+            <div class="status-message" id="status-message"></div>
+        </div>
+
+        <div class="button-container">
+            <button id="play-button">Play</button>
+            <button id="reset-button">Reset</button>
+        </div>
+    </main>
+
+    <footer>
+        <p>Developed by Jonathan Rothe</p>
+    </footer>
+
+    <script>
+        const playButton = document.getElementById('play-button');
+        const resetButton = document.getElementById('reset-button');
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        const inputSection = document.getElementById('input-section');
+        const playerAnswerInput = document.getElementById('player-answer');
+        const submitButton = document.getElementById('submit-button');
+        const statusMessage = document.getElementById('status-message');
+
+        canvas.width = canvas.clientWidth;
+        canvas.height = canvas.clientHeight;
+
+        let isGameStarted = false;
+        let isPaused = false;
+        let currentPuzzleIndex = 0;
+
+        let puzzle1Active = false;
+        let puzzle2Active = false;
+
+        // Puzzle 1: SOC scenario
+        const puzzle1Logs = [
+            "10.0.0.2 - login attempt - normal",
+            "10.0.0.15 - login attempt - normal",
+            "10.0.0.10 - login attempt - normal",
+            "10.0.0.42 - multiple failed admin logins (suspect!)",
+            "10.0.0.5 - login attempt - normal"
+        ];
+        const suspiciousLineIndex1 = 3; 
+        const lineHeight = 30;
+        const puzzle1Panel = {x:400-200, y:250-100, w:400, h:200};
+
+        // Puzzle 2: Phishing scenario
+        const puzzle2Emails = [
+            "Subject: Team Party - from HR (normal)",
+            "Subject: Your Account Locked - click here (suspect!)",
+            "Subject: Monthly Newsletter (normal)",
+            "Subject: Meeting Agenda (normal)"
+        ];
+        const suspiciousLineIndex2 = 1;
+        const puzzle2Panel = {x:400-200, y:250-100, w:400, h:200};
+
+        // Player properties
+        let player = {
+            x: 140,
+            y: 140,
+            speed: 2,
+            baseSize: 20,
+            animationCounter: 0,
+            moving: false,
+        };
+
+        const wallThickness = 20;
+        
+        // Outer walls
+        const outerWalls = [
+            {x:0, y:0, w:canvas.width, h:wallThickness, color:'#888'}, 
+            {x:0, y:0, w:wallThickness, h:canvas.height, color:'#888'},
+            {x:canvas.width - wallThickness, y:0, w:wallThickness, h:canvas.height, color:'#888'},
+            {x:0, y:canvas.height - wallThickness, w:canvas.width, h:wallThickness, color:'#888'}
+        ];
+
+        // Internal dividers with gaps
+        // Vertical divider with gap between y=180 and y=220
+        const verticalDividers = [
+            {x:395, y:20, w:10, h:160, color:'#555'},
+            {x:395, y:220, w:10, h:canvas.height -40 -220, color:'#555'}
+        ];
+
+        // Horizontal divider with gap between x=200 and x=280
+        const horizontalDividers = [
+            {x:20, y:245, w:180, h:10, color:'#555'},
+            {x:280, y:245, w:canvas.width -40 -280, h:10, color:'#555'}
+        ];
+
+        // Add more furniture to each room
+        // Top-left room (0,0 to 395,245)
+        const furnitureTopLeft = [
+            {x:60, y:60, w:40, h:20, color:'#8B4513'},
+            {x:100, y:180, w:30, h:30, color:'#a0522d'},
+            {x:150, y:60, w:20, h:40, color:'#2f4f4f'}, // a shelf at top
+        ];
+
+        // Top-right room (405,0 to 800,245)
+        const furnitureTopRight = [
+            {x:canvas.width - 200, y:50, w:60, h:30, color:'#2f4f4f'},
+            {x:canvas.width - 100, y:100, w:30, h:20, color:'#556b2f'},
+            {x:canvas.width -150, y:200, w:20, h:30, color:'#8b0000'}
+        ];
+
+        // Bottom-left room (0,255 to 395,500)
+        const furnitureBottomLeft = [
+            {x:50, y:canvas.height -150, w:50, h:30, color:'#b5651d'},
+            {x:60, y:300, w:40, h:20, color:'#cd853f'},
+            {x:180, y:400, w:20, h:20, color:'#696969'}
+        ];
+
+        // Bottom-right room (405,255 to 800,500)
+        const furnitureBottomRight = [
+            {x:canvas.width -180, y:canvas.height -120, w:40, h:40, color:'#696969'},
+            {x:canvas.width -220, y:350, w:30, h:30, color:'#8fbc8f'},
+            {x:canvas.width -120, y:360, w:40, h:20, color:'#ffa07a'}
+        ];
+
+        const furniture = [...furnitureTopLeft, ...furnitureTopRight, ...furnitureBottomLeft, ...furnitureBottomRight];
+
+        const collidables = [...outerWalls, ...verticalDividers, ...horizontalDividers, ...furniture];
+
+        // Puzzles
+        const puzzles = [
+            {
+                prompt: "SOC scenario: Multiple admin login attempts from unknown IPs out of 10.0.0.1–10.0.0.20. Identify suspicious IP.",
+                answer: "10.0.0.42",
+                x: 150,
+                y: 150,
+                isSocMiniGame: true,
+                isPhishMiniGame: false
+            },
+            {
+                prompt: "Phishing scenario: Identify the suspicious email link.",
+                answer: "Subject: Your Account Locked - click here (suspect!)",
+                x: 700,
+                y: 100,
+                isSocMiniGame: false,
+                isPhishMiniGame: true
+            },
+            {
+                prompt: "Caesar cipher 'Fdhvdu' shift=3. Decrypt.",
+                answer: "Caesar",
+                x: 100,
+                y: 300,
+                isSocMiniGame: false,
+                isPhishMiniGame: false
+            },
+            {
+                prompt: "MD5 of 'pa$$w0rd'. Enter known MD5.",
+                answer: "5f4dcc3b5aa765d61d8327deb882cf99",
+                x: 700,
+                y: 300,
+                isSocMiniGame: false,
+                isPhishMiniGame: false
+            }
+        ];
+
+        let keys = {};
+        canvas.addEventListener('mousedown', onMouseDown);
+        document.addEventListener('keydown', e => {
+            keys[e.key] = true;
+            if (e.key.toLowerCase() === 'e' && !isPaused && isGameStarted && inputSection.style.display==="none" && !puzzle1Active && !puzzle2Active) {
+                tryInteractWithPuzzle();
+            }
+        });
+        document.addEventListener('keyup', e => { keys[e.key] = false; });
+
+        submitButton.addEventListener('click', checkAnswer);
+
+        function checkAnswer() {
+            const userAnswer = playerAnswerInput.value.trim();
+            const correctAnswer = puzzles[currentPuzzleIndex].answer;
+            if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+                currentPuzzleIndex++;
+                inputSection.style.display = "none";
+                if (currentPuzzleIndex < puzzles.length) {
+                    statusMessage.textContent = "Correct! Find the next puzzle!";
+                } else {
+                    statusMessage.textContent = "All puzzles solved! You've escaped!";
+                }
+            } else {
+                statusMessage.textContent = "Incorrect answer, try again.";
+            }
+        }
+
+        function startGame() {
+            if (!isGameStarted) {
+                isGameStarted = true;
+                currentPuzzleIndex = 0;
+                isPaused = false;
+                statusMessage.textContent = "Find the first puzzle!";
+                playButton.textContent = "Pause";
+            } else {
+                isPaused = !isPaused;
+                playButton.textContent = isPaused ? "Resume" : "Pause";
+                if (isPaused) {
+                    statusMessage.textContent = "Game Paused";
+                    inputSection.style.display = "none";
+                } else {
+                    if (currentPuzzleIndex < puzzles.length) {
+                        statusMessage.textContent = "Find the next puzzle!";
+                    }
+                }
+            }
+        }
+
+        function resetGame() {
+            isGameStarted = false;
+            isPaused = false;
+            currentPuzzleIndex = 0;
+            puzzle1Active = false;
+            puzzle2Active = false;
+            player.x = 140;
+            player.y = 140;
+            statusMessage.textContent = "Press 'Play' to start the Cybersecurity Escape Room.";
+            inputSection.style.display = "none";
+            playerAnswerInput.value = "";
+            playButton.textContent = "Play";
+            draw();
+        }
+
+        playButton.addEventListener('click', () => {
+            if (!puzzle1Active && !puzzle2Active) startGame();
+        });
+        resetButton.addEventListener('click', resetGame);
+
+        function tryInteractWithPuzzle() {
+            if (currentPuzzleIndex < puzzles.length && playerNearPuzzle()) {
+                let puzzle = puzzles[currentPuzzleIndex];
+                if (puzzle.isSocMiniGame && !puzzle1Active && !puzzle2Active) {
+                    puzzle1Active = true;
+                    statusMessage.textContent = "SOC logs loaded. Click the suspicious IP.";
+                } else if (puzzle.isPhishMiniGame && !puzzle1Active && !puzzle2Active) {
+                    puzzle2Active = true;
+                    statusMessage.textContent = "Phishing emails loaded. Click the suspicious email.";
+                } else if (!puzzle.isSocMiniGame && !puzzle.isPhishMiniGame) {
+                    statusMessage.textContent = puzzle.prompt;
+                    inputSection.style.display = "flex";
+                    playerAnswerInput.value = "";
+                    playerAnswerInput.focus();
+                }
+            } else {
+                statusMessage.textContent = "Not close enough to puzzle.";
+            }
+        }
+
+        function playerNearPuzzle() {
+            if (currentPuzzleIndex >= puzzles.length) return false;
+            const puzzle = puzzles[currentPuzzleIndex];
+            const dx = player.x - puzzle.x;
+            const dy = player.y - puzzle.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            return dist < 50; 
+        }
+
+        function onMouseDown(e) {
+            const rect = canvas.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+
+            if (puzzle1Active) {
+                let startX = puzzle1Panel.x+20;
+                let startY = puzzle1Panel.y+40;
+                for (let i=0; i<puzzle1Logs.length; i++){
+                    let ly = startY + i*lineHeight;
+                    if (mx>startX && mx<(startX+puzzle1Panel.w-40) && my>ly-20 && my<ly) {
+                        if (i===suspiciousLineIndex1) {
+                            puzzle1Active = false;
+                            currentPuzzleIndex++; 
+                            statusMessage.textContent = "Correct! Find the next puzzle!";
+                        } else {
+                            statusMessage.textContent = "Not suspicious. Try again.";
+                        }
+                        break;
+                    }
+                }
+            }
+
+            if (puzzle2Active) {
+                let startX = puzzle2Panel.x+20;
+                let startY = puzzle2Panel.y+40;
+                for (let i=0; i<puzzle2Emails.length; i++){
+                    let ly = startY + i*lineHeight;
+                    if (mx>startX && mx<(startX+puzzle2Panel.w-40) && my>ly-20 && my<ly) {
+                        if (i===suspiciousLineIndex2) {
+                            puzzle2Active = false;
+                            currentPuzzleIndex++; 
+                            statusMessage.textContent = "Correct! Find the next puzzle!";
+                        } else {
+                            statusMessage.textContent = "Email looks normal. Try another.";
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+        function updatePlayer() {
+            if (!isPaused && isGameStarted && !puzzle1Active && !puzzle2Active) {
+                player.moving = false;
+                let dx = 0, dy = 0;
+                if (keys['ArrowUp'] || keys['w']) {
+                    dy = -player.speed;
+                    player.moving = true;
+                }
+                if (keys['ArrowDown'] || keys['s']) {
+                    dy = player.speed;
+                    player.moving = true;
+                }
+                if (keys['ArrowLeft'] || keys['a']) {
+                    dx = -player.speed;
+                    player.moving = true;
+                }
+                if (keys['ArrowRight'] || keys['d']) {
+                    dx = player.speed;
+                    player.moving = true;
+                }
+
+                let oldX = player.x, oldY = player.y;
+                player.x += dx;
+                player.y += dy;
+
+                // Check collision
+                if (checkCollision(player.x, player.y, player.baseSize, collidables)) {
+                    player.x = oldX;
+                    player.y = oldY;
+                }
+
+                if (player.moving) {
+                    player.animationCounter++;
+                } else {
+                    player.animationCounter = 0;
+                }
+            }
+        }
+
+        function checkCollision(px, py, pr, objects) {
+            for (let obj of objects) {
+                if (circleRectCollision(px, py, pr, obj.x, obj.y, obj.w, obj.h)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function circleRectCollision(cx, cy, cr, rx, ry, rw, rh) {
+            let closestX = Math.max(rx, Math.min(cx, rx+rw));
+            let closestY = Math.max(ry, Math.min(cy, ry+rh));
+            let dx = cx - closestX;
+            let dy = cy - closestY;
+            return (dx*dx+dy*dy) < (cr*cr);
+        }
+
+        function drawRoom() {
+            // Floor pattern
+            const tileSize = 20;
+            for (let y = 0; y < canvas.height; y += tileSize) {
+                for (let x = 0; x < canvas.width; x += tileSize) {
+                    ctx.fillStyle = ((x/tileSize + y/tileSize) % 2 === 0) ? '#e0e0e0' : '#d0d0d0';
+                    ctx.fillRect(x, y, tileSize, tileSize);
+                }
+            }
+
+            // Draw collidables (walls, dividers, furniture)
+            for (let obj of collidables) {
+                ctx.fillStyle = obj.color;
+                ctx.fillRect(obj.x, obj.y, obj.w, obj.h);
+            }
+
+            // Clear door at top center
+            ctx.clearRect(canvas.width/2 - 30,0,60,20);
+        }
+
+        function drawPuzzles() {
+            for (let i = currentPuzzleIndex; i < puzzles.length; i++) {
+                ctx.fillStyle = "#ff0";
+                ctx.beginPath();
+                ctx.arc(puzzles[i].x, puzzles[i].y, 10, 0, Math.PI*2);
+                ctx.fill();
+                ctx.fillStyle = "#333";
+                ctx.font = "12px Arial";
+                ctx.fillText("Puzzle " + (i+1), puzzles[i].x - 20, puzzles[i].y - 15);
+            }
+        }
+
+        function drawPlayer() {
+            const animationPhase = player.animationCounter % 30;
+            const sizeVariation = player.moving ? Math.sin(animationPhase / 30 * Math.PI * 2) * 2 : 0;
+            const playerSize = player.baseSize + sizeVariation;
+
+            ctx.fillStyle = player.moving ? '#00f' : '#005';
+            ctx.beginPath();
+            ctx.arc(player.x, player.y, playerSize, 0, Math.PI*2);
+            ctx.fill();
+        }
+
+        function drawPuzzle1UI() {
+            // Dim background
+            ctx.fillStyle = 'rgba(0,0,0,0.5)';
+            ctx.fillRect(0,0,canvas.width,canvas.height);
+
+            // SOC panel
+            ctx.fillStyle = '#333';
+            ctx.fillRect(puzzle1Panel.x, puzzle1Panel.y, puzzle1Panel.w, puzzle1Panel.h);
+            ctx.fillStyle = '#fff';
+            ctx.font = "16px Arial";
+            ctx.fillText("SOC Logs (Click suspicious IP):", puzzle1Panel.x+20, puzzle1Panel.y+20);
+
+            let startX = puzzle1Panel.x+20;
+            let startY = puzzle1Panel.y+40;
+            for (let i=0; i<puzzle1Logs.length; i++){
+                ctx.fillStyle = (i===suspiciousLineIndex1) ? '#f88' : '#fff';
+                ctx.fillText(puzzle1Logs[i], startX, startY + i*lineHeight);
+            }
+        }
+
+        function drawPuzzle2UI() {
+            // Dim background
+            ctx.fillStyle = 'rgba(0,0,0,0.5)';
+            ctx.fillRect(0,0,canvas.width,canvas.height);
+
+            // Phishing panel
+            ctx.fillStyle = '#333';
+            ctx.fillRect(puzzle2Panel.x, puzzle2Panel.y, puzzle2Panel.w, puzzle2Panel.h);
+            ctx.fillStyle = '#fff';
+            ctx.font = "16px Arial";
+            ctx.fillText("Emails (Click the suspicious one):", puzzle2Panel.x+20, puzzle2Panel.y+20);
+
+            let startX = puzzle2Panel.x+20;
+            let startY = puzzle2Panel.y+40;
+            for (let i=0; i<puzzle2Emails.length; i++){
+                ctx.fillStyle = (i===suspiciousLineIndex2) ? '#f88' : '#fff';
+                ctx.fillText(puzzle2Emails[i], startX, startY + i*lineHeight);
+            }
+        }
+
+        function update() {
+            updatePlayer();
+        }
+
+        function draw() {
+            drawRoom();
+            drawPuzzles();
+            drawPlayer();
+            if (puzzle1Active) {
+                drawPuzzle1UI();
+            }
+            if (puzzle2Active) {
+                drawPuzzle2UI();
+            }
+        }
+
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        statusMessage.textContent = "Press 'Play' to start the Cybersecurity Escape Room.";
+        inputSection.style.display = "none";
+        draw();
+        gameLoop();
+    </script>
+</body>
+</html>

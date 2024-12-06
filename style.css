@@ -130,266 +130,270 @@ a:hover {
     margin-bottom: 30px; /* Spacing below paragraphs */
 }
 
-/* Responsive project buttons */
-.project-buttons {
-    display: flex; /* Use flex layout */
-    flex-wrap: wrap; /* Allow buttons to wrap onto multiple lines */
-    justify-content: center; /* Center-align buttons horizontally */
-    margin-bottom: 20px; /* Spacing below the button group */
-    gap: 20px; /* Space between buttons */
+/* Make project buttons and images align in columns */
+.project-buttons,
+.project-images {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    justify-items: center;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px; 
 }
 
+/* Buttons styling */
 .project-buttons a {
-    padding: 15px 30px; /* Button padding */
-    border-radius: 20px; /* Rounded corners */
-    font-size: 1.2rem; /* Relative font size for scalability */
-    text-decoration: none; /* Remove underline from links */
-    color: white; /* White text color */
-    display: inline-block; /* Inline-block display for sizing */
-    flex: 1 1 200px; /* Flex properties for responsive sizing */
-    max-width: 300px; /* Maximum width for buttons */
-    text-align: center; /* Center-align text inside buttons */
+    padding: 15px 30px;
+    border-radius: 20px;
+    font-size: 1.2rem;
+    text-decoration: none;
+    color: white;
+    display: inline-block;
+    text-align: center;
 }
 
 /* Specific button colors */
 .project-buttons a.green {
-    background-color: #28a745; /* Green background */
+    background-color: #28a745;
 }
 
 .project-buttons a.red {
-    background-color: #dc3545; /* Red background */
+    background-color: #dc3545;
 }
 
 .project-buttons a.yellow {
-    background-color: #ffc107; /* Yellow background */
+    background-color: #ffc107;
 }
 
 .project-buttons a.blue {
-    background-color: #0f07ff; /* Blue background */
+    background-color: #0f07ff;
 }
 
 .project-buttons a:hover {
-    opacity: 0.9; /* Slightly transparent on hover */
+    opacity: 0.9;
 }
 
-/* Project images container */
-.project-images {
-    display: flex; /* Use flex layout */
-    flex-wrap: wrap; /* Allow images to wrap onto multiple lines */
-    justify-content: center; /* Center-align images horizontally */
-    gap: 20px; /* Space between images */
-}
-
-/* Individual project image styles */
+/* Project images styling */
 .project-images .image {
-    width: 200px; /* Fixed width */
-    height: 150px; /* Fixed height */
-    background-color: #ccc; /* Light gray background */
-    display: flex; /* Use flex to center content */
-    align-items: center; /* Vertical centering */
-    justify-content: center; /* Horizontal centering */
+    background-color: #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 18px;
-    color: black; /* Text color */
-    border: 1px solid #ddd; /* Border around the image */
-    transition: 0.3s; /* Transition effect for hover */
+    color: black;
+    border: 1px solid #ddd;
+    transition: 0.3s;
+    width: 100%; 
+    height: 150px; 
 }
 
-/* Ensure images fit within their containers */
 .project-images .image img {
-    max-width: 100%; /* Image will not exceed the container's width */
-    max-height: 100%; /* Image will not exceed the container's height */
+    max-width: 100%;
+    max-height: 100%;
 }
 
 /* Hover effect for project images */
 .project-images .image:hover {
-    background-color: #ddd; /* Darker background on hover */
+    background-color: #ddd;
 }
 
 /* Media queries for responsiveness */
-
-/* Medium screens (tablets) */
 @media screen and (min-width: 768px) {
     .project-buttons a {
-        font-size: 1.5rem; /* Increase font size */
+        font-size: 1.5rem;
     }
 
     .project-images .image {
-        width: 250px; /* Increase image width */
-        height: 200px; /* Increase image height */
+        height: 200px;
     }
 }
 
-/* Large screens (desktops) */
 @media screen and (min-width: 1024px) {
     .project-buttons a {
-        font-size: 1.8rem; /* Further increase font size */
+        font-size: 1.8rem;
     }
 
     .project-images .image {
-        width: 300px; /* Further increase image width */
-        height: 250px; /* Further increase image height */
+        height: 250px;
     }
 }
 
+/* Replace personal finance related CSS with the finance code provided */
 
+/* Finance tools specific styles */
 
-/* Styles for the test page */
-
-/* Container for the test */
-.test-container {
-    max-width: 800px; /* Maximum width */
-    margin: 0 auto; /* Center the container */
-    padding: 20px; /* Padding around the content */
-    text-align: center; /* Center-align content */
+/* Expense list container for Budgeting Tool */
+#budgeting-tool #expense-list {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
 }
 
-/* Question heading styles */
-.question h3 {
-    font-size: 1.2em; /* Font size */
-    margin-bottom: 10px; /* Space below the question */
+#budgeting-tool #expense-list div {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
 }
 
-/* Options list styles */
-.options {
-    list-style-type: none; /* Remove bullet points */
-    padding: 0; /* Remove default padding */
-    text-align: left; /* Align options to the left for readability */
-    display: inline-block; /* Inline-block to shrink-wrap content */
+#budgeting-tool #expense-list input[type="text"] {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }
 
-/* Individual option styles */
-.options li {
-    margin-bottom: 10px; /* Space below each option */
+#budgeting-tool #expense-list button.remove-expense {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
-/* Input styles for radio and checkbox options */
-.options input[type="radio"],
-.options input[type="checkbox"] {
-    margin-right: 10px; /* Space between input and label */
+#budgeting-tool #expense-list button.remove-expense:hover {
+    background-color: #c82333;
 }
 
-/* Navigation buttons container */
-.navigation-buttons {
-    text-align: center; /* Center-align buttons */
-    margin-top: 20px; /* Space above the buttons */
+.tool-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 120px; /* Increased gap between buttons */
+    margin-bottom: 40px;
+    padding: 20px 0;
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #ccc;
 }
 
-/* Navigation button styles */
-.navigation-buttons button {
-    padding: 10px 20px; /* Button padding */
-    margin: 0 5px; /* Horizontal spacing between buttons */
-    background-color: #007BFF; /* Blue background color */
-    color: white; /* White text color */
-    border: none; /* No border */
-    border-radius: 5px; /* Rounded corners */
-    cursor: pointer; /* Pointer cursor on hover */
+.tool-buttons button {
+    background-color: #6b5b95;
+    color: white;
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* Disabled button styles */
-.navigation-buttons button:disabled {
-    background-color: #cccccc; /* Gray background for disabled buttons */
-    cursor: not-allowed; /* Not-allowed cursor */
+.tool-buttons button:hover {
+    background-color: #5a4b82;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
 }
 
-/* Hover effect for enabled buttons */
-.navigation-buttons button:hover:not(:disabled) {
-    background-color: #0056b3; /* Darker blue on hover */
+.tool-buttons button.active {
+    background-color: #4e3d63;
+    color: #e4d7f7;
 }
 
-/* Result breakdown styles */
-.breakdown {
-    margin-top: 20px; /* Space above the breakdown */
+.tool-section {
+    display: none;
+    padding: 20px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    margin: 0 auto;
 }
 
-/* Explanation styles */
-.explanations {
-    margin-top: 20px; /* Space above explanations */
-    text-align: left; /* Left-align text */
+.tool-section.active {
+    display: block;
 }
 
-/* Individual explanation styles */
-.explanation {
-    padding: 10px; /* Padding around the explanation */
-    margin-bottom: 10px; /* Space below each explanation */
+.tool-section form {
+    display: inline-block;
+    text-align: left;
+    width: 100%;
 }
 
-.explanation h3 {
-    margin-bottom: 5px; /* Space below the heading */
+.tool-section form div {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
-.explanation p {
-    margin: 5px 0; /* Vertical spacing for paragraphs */
+.tool-section label {
+    display: inline-block;
+    width: 150px;
+    font-weight: bold;
+    text-align: right;
+    margin-right: 10px;
 }
 
-/* Styles specific to the finance tools */
-
-/* Finance tools container styles */
-#finance-tools section {
-    max-width: 600px; /* Maximum width for readability */
-    margin: 0 auto 40px auto; /* Center-align and space below each section */
-    text-align: center; /* Center-align section content */
+.tool-section input[type="text"],
+.tool-section select {
+    width: 60%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
 }
 
-/* Finance tools form styles */
-#finance-tools form {
-    display: inline-block; /* Shrink-wrap form content */
-    text-align: left; /* Left-align form elements */
+.tool-section button {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    display: block;
+    margin: 0 auto;
 }
 
-/* Spacing between form elements */
-#finance-tools form div {
-    margin-bottom: 10px; /* Space below each form group */
+.tool-section button:hover {
+    background-color: #218838;
 }
 
-/* Label styles within finance tools */
-#finance-tools label {
-    display: inline-block; /* Align labels and inputs horizontally */
-    width: 150px; /* Fixed width for labels to align inputs */
+/* Additional spacing for the calculate buttons */
+.calc-button {
+    margin-top: 30px;
+    margin-bottom: 30px;
 }
 
-/* Input and select styles within finance tools */
-#finance-tools input[type="number"],
-#finance-tools input[type="text"],
-#finance-tools select {
-    width: 200px; /* Consistent input width */
+.tool-section .error-message {
+    color: red;
+    font-weight: bold;
+    margin-top: 10px;
 }
 
-/* Button styles within finance tools */
-#finance-tools button {
-    padding: 10px 20px; /* Button padding */
-    margin-top: 10px; /* Space above buttons */
-    background-color: #28a745; /* Green background color */
-    color: white; /* White text color */
-    border: none; /* No border */
-    cursor: pointer; /* Pointer cursor on hover */
-}
+@media screen and (max-width: 768px) {
+    .tool-buttons {
+        flex-direction: column;
+        gap: 15px;
+        padding: 15px 0;
+    }
 
-/* Hover effect for finance tools buttons */
-#finance-tools button:hover {
-    background-color: #218838; /* Darker green on hover */
-}
+    .tool-buttons button {
+        width: 100%;
+    }
 
-/* Styles for the expense list within the finance tools */
+    .tool-section {
+        width: 90%;
+    }
 
-/* Expense list container */
-#finance-tools #expense-list {
-    margin-top: 10px; /* Space above the expense list */
-}
+    .tool-section form div {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 
-/* Individual expense item styles */
-#finance-tools #expense-list div {
-    margin-bottom: 5px; /* Space below each expense item */
-}
+    .tool-section label {
+        text-align: left;
+        margin-bottom: 5px;
+        width: 100%;
+    }
 
-/* Input styles for expense items */
-#finance-tools #expense-list input[type="text"],
-#finance-tools #expense-list input[type="number"] {
-    width: 180px; /* Input width */
-}
-
-/* Error message styles within the finance tools */
-#finance-tools .error-message {
-    color: red; /* Red text color for errors */
-    font-weight: bold; /* Bold text */
-    margin-top: 10px; /* Space above the error message */
+    .tool-section input[type="text"],
+    .tool-section select {
+        width: 100%;
+    }
 }
